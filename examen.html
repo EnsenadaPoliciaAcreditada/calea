@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Autoevaluación CALEA — Personal DSPM Ensenada</title>
+  <meta name="description" content="Autoevaluación interna de conocimientos sobre CALEA para el personal de la Dirección de Seguridad Pública Municipal de Ensenada." />
+  <meta name="theme-color" content="#0a1730" />
+  <meta name="robots" content="noindex" />
+
+  <link rel="icon" type="image/png" href="assets/logos/Logo-policia.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/header-hero.css" />
+  <link rel="stylesheet" href="css/sections.css" />
+  <link rel="stylesheet" href="css/footer.css" />
+
+  <style>
+    .exam-hero {
+      background: var(--gradient-navy);
+      color: var(--white);
+      padding: var(--space-10) 0 var(--space-8);
+    }
+    .exam-hero .eyebrow { color: var(--gold-400); }
+    .exam-hero .section-title { color: var(--white); }
+    .exam-hero p { color: var(--silver-300); max-width: 640px; }
+
+    .exam-card {
+      max-width: 720px;
+      margin: 0 auto;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: var(--space-7);
+    }
+
+    .exam-field { margin-bottom: var(--space-5); }
+    .exam-field label {
+      display: block;
+      font-size: var(--fs-xs);
+      letter-spacing: var(--ls-wide);
+      text-transform: uppercase;
+      color: var(--ink-500);
+      margin-bottom: var(--space-2);
+    }
+    .exam-field input {
+      width: 100%;
+      padding: 0.85em 1em;
+      background: var(--offwhite);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      color: var(--ink-900);
+      font-family: var(--font-body);
+      font-size: var(--fs-sm);
+    }
+    .exam-field input:focus {
+      outline: none;
+      border-color: var(--gold-500);
+    }
+
+    .exam-question {
+      padding: var(--space-5) 0;
+      border-top: 1px solid var(--line);
+    }
+    .exam-question:first-of-type { border-top: none; }
+    .exam-question-text {
+      font-family: var(--font-display);
+      font-size: var(--fs-base);
+      color: var(--ink-900);
+      margin-bottom: var(--space-3);
+    }
+    .exam-option {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-3);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background var(--dur-fast) var(--ease-out);
+    }
+    .exam-option:hover { background: var(--paper); }
+    .exam-option input { accent-color: var(--gold-600); }
+    .exam-option span { color: var(--ink-700); font-size: var(--fs-sm); }
+
+    .exam-status {
+      text-align: center;
+      color: var(--ink-500);
+      font-size: var(--fs-sm);
+      padding: var(--space-8) 0;
+    }
+
+    .exam-result {
+      text-align: center;
+      padding: var(--space-6) 0;
+    }
+    .exam-result .score {
+      font-family: var(--font-display);
+      font-size: var(--fs-2xl);
+      color: var(--navy-800);
+    }
+    .exam-result p { color: var(--ink-500); margin-top: var(--space-2); }
+
+    .exam-error {
+      text-align: center;
+      color: #a33;
+      font-size: var(--fs-sm);
+      padding: var(--space-4) 0;
+      display: none;
+    }
+    .exam-error.is-visible { display: block; }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Saltar al contenido</a>
+
+  <header class="site-header" id="siteHeader">
+    <div class="container">
+      <a class="brand" href="index.html">
+        <span class="header-calea-chip">
+          <img src="assets/logos/calea-logo.png" alt="CALEA — The Gold Standard in Public Safety" />
+        </span>
+        <img class="brand-badge" src="assets/logos/Logo-policia.png" alt="Escudo Policía Municipal de Ensenada" width="84" height="84" />
+        <span class="brand-text">
+          <strong>DSPM Ensenada</strong>
+          <span>Acreditación CALEA</span>
+        </span>
+      </a>
+      <a class="btn btn-ghost" href="index.html">Volver al inicio</a>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="exam-hero">
+      <div class="container">
+        <span class="eyebrow">Personal DSPM · Uso interno</span>
+        <h1 class="section-title">Autoevaluación CALEA</h1>
+        <p>Cuestionario de práctica para que el personal de la Dirección de Seguridad Pública Municipal repase conceptos generales del proceso de acreditación CALEA. Tus respuestas se registran para dar seguimiento a la capacitación.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="exam-card" id="examCard">
+          <p class="exam-status" id="examStatus">Cargando preguntas…</p>
+          <p class="exam-error" id="examError">No se pudieron cargar las preguntas. Verifica tu conexión e intenta de nuevo más tarde.</p>
+
+          <form id="examForm" hidden>
+            <div class="exam-field">
+              <label for="examNombre">Nombre completo</label>
+              <input id="examNombre" name="nombre" type="text" required />
+            </div>
+            <div class="exam-field">
+              <label for="examArea">Área / número de placa</label>
+              <input id="examArea" name="area" type="text" required />
+            </div>
+
+            <div id="examQuestions"></div>
+
+            <button class="btn btn-primary" type="submit" style="width:100%; justify-content:center; margin-top:var(--space-4);">
+              Enviar respuestas
+            </button>
+          </form>
+
+          <div class="exam-result" id="examResult" hidden>
+            <div class="score" id="examScore"></div>
+            <p>Gracias, tu resultado quedó registrado.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom" style="border-top:0; padding-top:0;">
+        <span>© <span id="year"></span> Dirección de Seguridad Pública Municipal de Ensenada. Todos los derechos reservados.</span>
+        <span>Sitio informativo del proceso de acreditación CALEA</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Pega aquí la URL de tu Web App de Google Apps Script (Deploy > New deployment > Web app)
+    const APPS_SCRIPT_URL = "PEGA_AQUI_LA_URL_DE_TU_WEB_APP";
+
+    const statusEl = document.getElementById("examStatus");
+    const errorEl = document.getElementById("examError");
+    const formEl = document.getElementById("examForm");
+    const questionsEl = document.getElementById("examQuestions");
+    const resultEl = document.getElementById("examResult");
+    const scoreEl = document.getElementById("examScore");
+
+    async function loadQuestions() {
+      if (APPS_SCRIPT_URL.startsWith("PEGA_AQUI")) {
+        statusEl.textContent = "Este examen aún no está configurado. Falta enlazar la URL de Apps Script.";
+        return;
+      }
+      try {
+        const res = await fetch(APPS_SCRIPT_URL);
+        if (!res.ok) throw new Error("network");
+        const data = await res.json();
+        renderQuestions(data.preguntas || []);
+      } catch (err) {
+        statusEl.hidden = true;
+        errorEl.classList.add("is-visible");
+      }
+    }
+
+    function renderQuestions(preguntas) {
+      if (!preguntas.length) {
+        statusEl.textContent = "No hay preguntas disponibles por el momento.";
+        return;
+      }
+      questionsEl.innerHTML = preguntas
+        .map((p, i) => {
+          const opciones = [
+            ["A", p.opcionA],
+            ["B", p.opcionB],
+            ["C", p.opcionC],
+            ["D", p.opcionD],
+          ];
+          const options = opciones
+            .map(
+              ([letra, texto]) => `
+              <label class="exam-option">
+                <input type="radio" name="p${p.id}" value="${letra}" required />
+                <span>${letra}) ${texto}</span>
+              </label>`
+            )
+            .join("");
+          return `
+            <div class="exam-question">
+              <div class="exam-question-text">${i + 1}. ${p.pregunta}</div>
+              ${options}
+            </div>`;
+        })
+        .join("");
+
+      statusEl.hidden = true;
+      formEl.hidden = false;
+    }
+
+    formEl.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const submitBtn = formEl.querySelector("button[type='submit']");
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Enviando…";
+
+      const formData = new FormData(formEl);
+      const nombre = formData.get("nombre");
+      const area = formData.get("area");
+      const respuestas = {};
+      for (const [key, value] of formData.entries()) {
+        if (key.startsWith("p")) {
+          respuestas[key.slice(1)] = value;
+        }
+      }
+
+      try {
+        const res = await fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ nombre, area, respuestas }),
+        });
+        const data = await res.json();
+        formEl.hidden = true;
+        resultEl.hidden = false;
+        scoreEl.textContent = `${data.puntaje} / ${data.total}`;
+      } catch (err) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Enviar respuestas";
+        alert("No se pudo enviar tu examen. Intenta de nuevo.");
+      }
+    });
+
+    loadQuestions();
+
+    const yearEl = document.getElementById("year");
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
