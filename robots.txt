@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ensenadapoliciaacreditada.github.io/calea/sitemap.xml
