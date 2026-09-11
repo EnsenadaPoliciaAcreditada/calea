@@ -5,4 +5,54 @@
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
   </url>
+  <url>
+    <loc>https://ensenadapoliciaacreditada.github.io/calea/directivas/direccion.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ensenadapoliciaacreditada.github.io/calea/directivas/subdireccion-administrativa.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ensenadapoliciaacreditada.github.io/calea/directivas/subdireccion-juridica.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ensenadapoliciaacreditada.github.io/calea/directivas/subdireccion-operativa.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ensenadapoliciaacreditada.github.io/calea/directivas/inteligencia.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ensenadapoliciaacreditada.github.io/calea/directivas/subdireccion-profesionalizacion.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ensenadapoliciaacreditada.github.io/calea/directivas/prevencion-al-delito.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ensenadapoliciaacreditada.github.io/calea/directivas/transito.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ensenadapoliciaacreditada.github.io/calea/directivas/no-aplicables.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://ensenadapoliciaacreditada.github.io/calea/directivas/comunicacion.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>
