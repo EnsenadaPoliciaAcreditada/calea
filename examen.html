@@ -169,7 +169,10 @@
 
           <div class="exam-result" id="examResult" hidden>
             <div class="score" id="examScore"></div>
-            <p>Gracias, tu resultado quedó registrado.</p>
+            <p id="examResultMsg"></p>
+            <button class="btn btn-primary" id="diplomaBtn" type="button" hidden>
+              Descargar diploma
+            </button>
           </div>
         </div>
       </div>
@@ -185,9 +188,13 @@
     </div>
   </footer>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
     // Pega aquí la URL de tu Web App de Google Apps Script (Deploy > New deployment > Web app)
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxp5x-N9F9MiMHh-LxGhuUABppDAivDJY_wHwOJ2FH6iV16fBde93zRM9_y8Avq8grzWQ/exec";
+
+    // Calificación mínima (%) para obtener el diploma. Cámbiala aquí si lo necesitas.
+    const PASSING_PERCENT = 70;
 
     const statusEl = document.getElementById("examStatus");
     const errorEl = document.getElementById("examError");
@@ -195,6 +202,8 @@
     const questionsEl = document.getElementById("examQuestions");
     const resultEl = document.getElementById("examResult");
     const scoreEl = document.getElementById("examScore");
+    const resultMsgEl = document.getElementById("examResultMsg");
+    const diplomaBtn = document.getElementById("diplomaBtn");
 
     async function loadQuestions() {
       if (APPS_SCRIPT_URL.startsWith("PEGA_AQUI")) {
@@ -272,12 +281,128 @@
         formEl.hidden = true;
         resultEl.hidden = false;
         scoreEl.textContent = `${data.puntaje} / ${data.total}`;
+
+        const percent = Math.round((data.puntaje / data.total) * 100);
+        if (percent >= PASSING_PERCENT) {
+          resultMsgEl.textContent = `¡Aprobado con ${percent}%! Tu resultado quedó registrado.`;
+          diplomaBtn.hidden = false;
+          diplomaBtn.onclick = () => {
+            diplomaBtn.disabled = true;
+            diplomaBtn.textContent = "Generando…";
+            generateDiploma({ nombre, area, puntaje: data.puntaje, total: data.total, percent })
+              .catch(() => alert("No se pudo generar el diploma. Intenta de nuevo."))
+              .finally(() => {
+                diplomaBtn.disabled = false;
+                diplomaBtn.textContent = "Descargar diploma";
+              });
+          };
+        } else {
+          resultMsgEl.textContent = `Obtuviste ${percent}%. Se requiere al menos ${PASSING_PERCENT}% para obtener el diploma. Tu resultado quedó registrado.`;
+        }
       } catch (err) {
         submitBtn.disabled = false;
         submitBtn.textContent = "Enviar respuestas";
         alert("No se pudo enviar tu examen. Intenta de nuevo.");
       }
     });
+
+    async function loadImageAsDataURL(url) {
+      const res = await fetch(url);
+      const blob = await res.blob();
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    }
+
+    async function generateDiploma({ nombre, area, puntaje, total, percent }) {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+      const navy = [10, 23, 48];
+      const gold = [201, 160, 75];
+      const w = doc.internal.pageSize.getWidth();
+      const h = doc.internal.pageSize.getHeight();
+
+      doc.setDrawColor(...navy);
+      doc.setLineWidth(1.2);
+      doc.rect(8, 8, w - 16, h - 16);
+      doc.setDrawColor(...gold);
+      doc.setLineWidth(0.6);
+      doc.rect(12, 12, w - 24, h - 24);
+
+      try {
+        const [policiaLogo, caleaLogo] = await Promise.all([
+          loadImageAsDataURL("assets/logos/Logo-policia.png"),
+          loadImageAsDataURL("assets/logos/calea-logo.png"),
+        ]);
+        doc.addImage(policiaLogo, "PNG", 24, 18, 26, 26);
+        doc.addImage(caleaLogo, "PNG", w - 24 - 42, 22, 42, 20);
+      } catch (err) {
+        // Los logos son decorativos; si fallan, el diploma se genera igual sin ellos.
+      }
+
+      doc.setTextColor(...navy);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(24);
+      doc.text("CONSTANCIA DE AUTOEVALUACIÓN CALEA", w / 2, 52, { align: "center" });
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(12);
+      doc.setTextColor(90, 90, 90);
+      doc.text(
+        "Dirección de Seguridad Pública Municipal de Ensenada, Baja California, México",
+        w / 2,
+        60,
+        { align: "center" }
+      );
+
+      doc.setTextColor(...navy);
+      doc.setFontSize(13);
+      doc.text("Se otorga la presente constancia a:", w / 2, 82, { align: "center" });
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(28);
+      doc.setTextColor(...gold);
+      doc.text(nombre, w / 2, 97, { align: "center" });
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(12);
+      doc.setTextColor(...navy);
+      doc.text(`Área / Placa: ${area}`, w / 2, 107, { align: "center" });
+
+      doc.setFontSize(13);
+      const bodyText = `Por haber acreditado la autoevaluación de conocimientos sobre el proceso de acreditación CALEA, con una calificación de ${puntaje}/${total} (${percent}%).`;
+      const bodyLines = doc.splitTextToSize(bodyText, w - 90);
+      doc.text(bodyLines, w / 2, 122, { align: "center" });
+
+      const fecha = new Date().toLocaleDateString("es-MX", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+      doc.setFontSize(11);
+      doc.text(`Ensenada, Baja California, a ${fecha}`, w / 2, h - 28, { align: "center" });
+
+      doc.setFontSize(8);
+      doc.setTextColor(140, 140, 140);
+      doc.text(
+        "Documento generado automáticamente por el sistema de autoevaluación CALEA — DSPM Ensenada",
+        w / 2,
+        h - 16,
+        { align: "center" }
+      );
+
+      const slug = nombre
+        .trim()
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9-]/g, "");
+      doc.save(`diploma-calea-${slug || "personal"}.pdf`);
+    }
 
     loadQuestions();
 
