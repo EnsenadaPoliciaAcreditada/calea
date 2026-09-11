@@ -114,6 +114,19 @@
       display: none;
     }
     .exam-error.is-visible { display: block; }
+
+    .exam-agent {
+      text-align: center;
+      font-family: var(--font-display);
+      font-size: var(--fs-sm);
+      letter-spacing: var(--ls-wide);
+      text-transform: uppercase;
+      color: var(--navy-800);
+      background: var(--paper);
+      border-radius: var(--radius-sm);
+      padding: var(--space-3);
+      margin-bottom: var(--space-5);
+    }
   </style>
 </head>
 <body>
@@ -147,18 +160,22 @@
     <section class="section">
       <div class="container">
         <div class="exam-card" id="examCard">
-          <p class="exam-status" id="examStatus">Cargando preguntas…</p>
-          <p class="exam-error" id="examError">No se pudieron cargar las preguntas. Verifica tu conexión e intenta de nuevo más tarde.</p>
+          <form id="cuipForm">
+            <div class="exam-field">
+              <label for="examCuip">CUIP</label>
+              <input id="examCuip" name="cuip" type="text" autocomplete="off" required />
+            </div>
+            <button class="btn btn-primary" type="submit" style="width:100%; justify-content:center;">
+              Verificar acceso
+            </button>
+            <p class="exam-error" id="cuipError">CUIP no autorizado. Verifica tu número o contacta al equipo de acreditación.</p>
+          </form>
+
+          <p class="exam-status" id="examStatus" hidden>Verificando…</p>
+          <p class="exam-error" id="examError">No se pudo conectar. Verifica tu conexión e intenta de nuevo más tarde.</p>
 
           <form id="examForm" hidden>
-            <div class="exam-field">
-              <label for="examNombre">Nombre completo</label>
-              <input id="examNombre" name="nombre" type="text" required />
-            </div>
-            <div class="exam-field">
-              <label for="examArea">Área / número de placa</label>
-              <input id="examArea" name="area" type="text" required />
-            </div>
+            <p class="exam-agent" id="examAgentLabel"></p>
 
             <div id="examQuestions"></div>
 
@@ -196,34 +213,24 @@
     // Calificación mínima (%) para obtener el diploma. Cámbiala aquí si lo necesitas.
     const PASSING_PERCENT = 70;
 
+    const cuipFormEl = document.getElementById("cuipForm");
+    const cuipInputEl = document.getElementById("examCuip");
+    const cuipErrorEl = document.getElementById("cuipError");
     const statusEl = document.getElementById("examStatus");
     const errorEl = document.getElementById("examError");
     const formEl = document.getElementById("examForm");
+    const agentLabelEl = document.getElementById("examAgentLabel");
     const questionsEl = document.getElementById("examQuestions");
     const resultEl = document.getElementById("examResult");
     const scoreEl = document.getElementById("examScore");
     const resultMsgEl = document.getElementById("examResultMsg");
     const diplomaBtn = document.getElementById("diplomaBtn");
 
-    async function loadQuestions() {
-      if (APPS_SCRIPT_URL.startsWith("PEGA_AQUI")) {
-        statusEl.textContent = "Este examen aún no está configurado. Falta enlazar la URL de Apps Script.";
-        return;
-      }
-      try {
-        const res = await fetch(APPS_SCRIPT_URL);
-        if (!res.ok) throw new Error("network");
-        const data = await res.json();
-        renderQuestions(data.preguntas || []);
-      } catch (err) {
-        statusEl.hidden = true;
-        errorEl.classList.add("is-visible");
-      }
-    }
+    let cuipActual = "";
 
     function renderQuestions(preguntas) {
       if (!preguntas.length) {
-        statusEl.textContent = "No hay preguntas disponibles por el momento.";
+        questionsEl.innerHTML = "<p>No hay preguntas disponibles por el momento.</p>";
         return;
       }
       questionsEl.innerHTML = preguntas
@@ -250,10 +257,48 @@
             </div>`;
         })
         .join("");
-
-      statusEl.hidden = true;
-      formEl.hidden = false;
     }
+
+    cuipFormEl.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      cuipErrorEl.classList.remove("is-visible");
+      errorEl.classList.remove("is-visible");
+
+      const cuip = cuipInputEl.value.trim();
+      if (!cuip) return;
+
+      const verifyBtn = cuipFormEl.querySelector("button[type='submit']");
+      verifyBtn.disabled = true;
+      verifyBtn.textContent = "Verificando…";
+      cuipFormEl.hidden = true;
+      statusEl.hidden = false;
+
+      try {
+        const res = await fetch(`${APPS_SCRIPT_URL}?cuip=${encodeURIComponent(cuip)}`);
+        if (!res.ok) throw new Error("network");
+        const data = await res.json();
+
+        if (!data.autorizado) {
+          statusEl.hidden = true;
+          cuipFormEl.hidden = false;
+          cuipErrorEl.classList.add("is-visible");
+          return;
+        }
+
+        cuipActual = cuip;
+        agentLabelEl.textContent = `Agente: ${data.nombre} ${data.apellidos}`;
+        renderQuestions(data.preguntas || []);
+        statusEl.hidden = true;
+        formEl.hidden = false;
+      } catch (err) {
+        statusEl.hidden = true;
+        cuipFormEl.hidden = false;
+        errorEl.classList.add("is-visible");
+      } finally {
+        verifyBtn.disabled = false;
+        verifyBtn.textContent = "Verificar acceso";
+      }
+    });
 
     formEl.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -262,8 +307,6 @@
       submitBtn.textContent = "Enviando…";
 
       const formData = new FormData(formEl);
-      const nombre = formData.get("nombre");
-      const area = formData.get("area");
       const respuestas = {};
       for (const [key, value] of formData.entries()) {
         if (key.startsWith("p")) {
@@ -275,13 +318,16 @@
         const res = await fetch(APPS_SCRIPT_URL, {
           method: "POST",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({ nombre, area, respuestas }),
+          body: JSON.stringify({ cuip: cuipActual, respuestas }),
         });
         const data = await res.json();
+        if (data.error) throw new Error(data.error);
+
         formEl.hidden = true;
         resultEl.hidden = false;
         scoreEl.textContent = `${data.puntaje} / ${data.total}`;
 
+        const nombreCompleto = `${data.nombre} ${data.apellidos}`.trim();
         const percent = Math.round((data.puntaje / data.total) * 100);
         if (percent >= PASSING_PERCENT) {
           resultMsgEl.textContent = `¡Aprobado con ${percent}%! Tu resultado quedó registrado.`;
@@ -289,7 +335,7 @@
           diplomaBtn.onclick = () => {
             diplomaBtn.disabled = true;
             diplomaBtn.textContent = "Generando…";
-            generateDiploma({ nombre, area, puntaje: data.puntaje, total: data.total, percent })
+            generateDiploma({ nombre: nombreCompleto, puntaje: data.puntaje, total: data.total, percent })
               .catch(() => alert("No se pudo generar el diploma. Intenta de nuevo."))
               .finally(() => {
                 diplomaBtn.disabled = false;
@@ -317,7 +363,7 @@
       });
     }
 
-    async function generateDiploma({ nombre, area, puntaje, total, percent }) {
+    async function generateDiploma({ nombre, puntaje, total, percent }) {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
       const navy = [10, 23, 48];
@@ -368,14 +414,11 @@
       doc.text(nombre, w / 2, 97, { align: "center" });
 
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(12);
-      doc.setTextColor(...navy);
-      doc.text(`Área / Placa: ${area}`, w / 2, 107, { align: "center" });
-
       doc.setFontSize(13);
+      doc.setTextColor(...navy);
       const bodyText = `Por haber acreditado la autoevaluación de conocimientos sobre el proceso de acreditación CALEA, con una calificación de ${puntaje}/${total} (${percent}%).`;
       const bodyLines = doc.splitTextToSize(bodyText, w - 90);
-      doc.text(bodyLines, w / 2, 122, { align: "center" });
+      doc.text(bodyLines, w / 2, 112, { align: "center" });
 
       const fecha = new Date().toLocaleDateString("es-MX", {
         year: "numeric",
@@ -403,8 +446,6 @@
         .replace(/[^a-z0-9-]/g, "");
       doc.save(`diploma-calea-${slug || "personal"}.pdf`);
     }
-
-    loadQuestions();
 
     const yearEl = document.getElementById("year");
     if (yearEl) yearEl.textContent = new Date().getFullYear();
