@@ -1,132 +1,127 @@
 [
   {
     "code": "4.1.1",
-    "title": "Uso de Fuerza razonable",
-    "file": "4.1.1 Uso de Fuerza razonable.pdf"
+    "title": "Uso de fuerza razonable",
+    "file": "D.E. 4.1.1 Uso de fuerza razonable.pdf"
   },
   {
     "code": "4.1.2",
     "title": "Uso de fuerza letal",
-    "file": "4.1.2 Uso de fuerza letal.pdf"
+    "file": "D.E. 4.1.2 Uso de fuerza letal.pdf"
   },
   {
     "code": "4.1.4",
     "title": "Uso de armas menos letales autorizadas",
-    "file": "4.1.4 Uso de armas menos letales autorizadas.pdf"
+    "file": "D.E. 4.1.4 Uso de armas menos letales autorizadas.pdf"
   },
   {
     "code": "4.3.2",
-    "title": "Demostracion de idoneidad con las armas",
-    "file": "4.3.2 Demostracion de idoneidad con las armas.pdf"
+    "title": "Demostración de idoneidad con las armas",
+    "file": "D.E. 4.3.2 Demostración de idoneidad con las armas.pdf"
   },
   {
     "code": "4.3.3",
-    "title": "Capacitacion de idoneidad anual o bienal",
-    "file": "4.3.3 Capacitacion de idoneidad anual o bienal.pdf"
+    "title": "Capacitación de idoneidad anual o bianual en el uso de armas letales o menos letales",
+    "file": "D.E. 4.3.3 Capacitación de idoneidad anual o bianual en el uso de armas letales o menos letales.pdf"
   },
   {
     "code": "4.3.4",
-    "title": "requisitos previos para portar armas letales y menos letales",
-    "file": "4.3.4 requisitos previos para portar armas letales y menos letales.pdf"
+    "title": "Requisitos previos para portar armas letales y menos letales",
+    "file": "D.E. 4.3.4 Requisitos previos para portar armas letales y menos letales.pdf"
   },
   {
     "code": "22.2.2",
-    "title": "Salud general y aptitud fisica",
-    "file": "22.2.2 Salud general y aptitud fisica.pdf"
+    "title": "Salud general y aptitud física",
+    "file": "D.E. 22.2.2 Salud general y aptitud física.pdf"
   },
   {
     "code": "31.2.1",
-    "title": "Plan de Reclutamiento",
-    "file": "31.2.1 Plan de Reclutamiento.pdf"
+    "title": "Plan de reclutamiento",
+    "file": "D.E. 31.2.1 Plan de reclutamiento.pdf"
   },
   {
     "code": "31.4.1",
-    "title": "Descripcion del proceso de seleccion",
-    "file": "31.4.1 Descripcion del proceso de seleccion.pdf"
+    "title": "Descripción del proceso de selección",
+    "file": "D.E. 31.4.1 Descripción del proceso de selección.pdf"
   },
   {
     "code": "31.4.7",
-    "title": "criterios de seleccion.",
-    "file": "31.4.7 criterios de seleccion..pdf"
+    "title": "Criterios de selección",
+    "file": "D.E. 31.4.7 Criterios de selección.pdf"
   },
   {
     "code": "31.5.1",
-    "title": "Descripcion del proceso de seleccion",
-    "file": "31.5.1 Descripcion del proceso de seleccion.pdf"
+    "title": "Investigación de antecedentes",
+    "file": "D.E. 31.5.1 Investigación de antecedentes.pdf"
   },
   {
     "code": "31.5.7",
-    "title": "Examenes psicofisicos y de estabilidad emoscional",
-    "file": "31.5.7 Examenes psicofisicos y de estabilidad emoscional.pdf"
+    "title": "Exámenes psicofísicos y de estabilidad emocional",
+    "file": "D.E. 31.5.7 Exámenes psicofísicos y de estabilidad emocional.pdf"
   },
   {
     "code": "33.1.5",
-    "title": "Capacitacion correctiva",
-    "file": "33.1.5 Capacitacion correctiva.pdf"
+    "title": "Capacitación correctiva",
+    "file": "D.E. 33.1.5 Capacitación correctiva.pdf"
   },
   {
     "code": "33.1.6",
-    "title": "Mantenimiento de registro de capacitacion de empleados",
-    "file": "33.1.6 Mantenimiento de registro de capacitacion de empleados.pdf"
+    "title": "Mantenimiento de registro de capacitación de empleados",
+    "file": "D.E. 33.1.6 Mantenimiento de registro de capacitación de empleados.pdf"
   },
   {
     "code": "33.4.1",
-    "title": "Requisitos de capacitacion para el nivel de entrada",
-    "file": "33.4.1 Requisitos de capacitacion para el nivel de entrada.pdf"
+    "title": "Entrenamiento de recluta requerido",
+    "file": "D.E. 33.4.1 Entrenamiento de recluta requerido.pdf"
   },
   {
     "code": "33.4.2",
-    "title": "Programa de formacion basica policial",
-    "file": "33.4.2 Programa de formacion basica policial.pdf"
+    "title": "Programa de capacitación de reclutamiento",
+    "file": "D.E. 33.4.2 Programa de capacitación de reclutamiento.pdf"
   },
   {
     "code": "33.4.3",
     "title": "Programa de capacitación de campo",
-    "file": "33.4.3 Programa de capacitación de campo.pdf"
+    "file": "D.E. 33.4.3 Programa de capacitación de campo.pdf"
   },
   {
     "code": "33.5.1",
-    "title": "Programa anual de capacitacion en servicio",
-    "file": "33.5.1 Programa anual de capacitacion en servicio.pdf"
+    "title": "Programa anual de capacitación en servicio",
+    "file": "D.E. 33.5.1 Programa anual de capacitación en servicio.pdf"
   },
   {
     "code": "33.8.2",
-    "title": "Capacitacion de desarollo de habilidades ante un asenso",
-    "file": "33.8.2 Capacitacion de desarollo de habilidades ante un asenso.pdf"
+    "title": "Capacitación de desarrollo de habilidades ante un ascenso",
+    "file": "D.E. 33.8.2 Capacitación de desarrollo de habilidades ante un ascenso.pdf"
   },
   {
     "code": "35.1.2",
-    "title": "Evaluacion anual",
-    "file": "35.1.2 Evaluacion anual.pdf"
+    "title": "Evaluación anual",
+    "file": "D.E. 35.1.2 Evaluación anual.pdf"
   },
   {
     "code": "46.1.9",
-    "title": "Entrenamiento para plan multi amenazas",
-    "file": "46.1.9 Entrenamiento para plan multi amenazas.pdf"
+    "title": "Entrenamiento para el Plan Multiamenazas",
+    "file": "D.E. 46.1.9  Entrenamiento para el Plan Multiamenazas.pdf"
   },
   {
     "code": "46.3.2",
-    "title": "Capacitacion sobre concientizacion de materiales peligrosos",
-    "file": "46.3.2 Capacitacion sobre concientizacion de materiales peligrosos.pdf"
+    "title": "Capacitación sobre concientización de Materiales Peligrosos",
+    "file": "D.E. 46.3.2 Capacitación sobre concientización de Materiales Peligrosos.pdf"
   },
   {
     "code": "71.2.1",
-    "title": "Capacitacion del Peersonal",
-    "file": "71.2.1 Capacitacion del Peersonal.pdf"
+    "title": "Capacitación",
+    "file": "D.E. 71.2.1 Capacitación.pdf"
   },
   {
     "code": "71.3.1",
-    "title": "Capacitacion",
-    "file": "71.3.1 Capacitacion.pdf"
+    "title": "Capacitación",
+    "file": "D.E. 71.3.1 Capacitación.pdf"
   },
   {
     "code": "72.1.1",
-    "title": "Capacitacion del personal usuario",
-    "file": "72.1.1 Capacitacion del personal usuario.pdf"
-  },
-  {
-    "code": "82.2.1",
-    "title": "Sistema de informacion de campo",
-    "file": "82.2.1 Sistema de informacion de campo.pdf"
+    "title": "Capacitación del personal usuario",
+    "file": "D.E. 72.1.1 Capacitación del personal usuario.pdf"
   }
 ]
