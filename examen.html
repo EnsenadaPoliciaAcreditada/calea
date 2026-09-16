@@ -165,10 +165,14 @@
               <label for="examCuip">CUIP</label>
               <input id="examCuip" name="cuip" type="text" autocomplete="off" required />
             </div>
+            <div class="exam-field">
+              <label for="examPin">PIN personal</label>
+              <input id="examPin" name="pin" type="password" inputmode="numeric" autocomplete="off" required />
+            </div>
             <button class="btn btn-primary" type="submit" style="width:100%; justify-content:center;">
               Verificar acceso
             </button>
-            <p class="exam-error" id="cuipError">CUIP no autorizado. Verifica tu número o contacta al equipo de acreditación.</p>
+            <p class="exam-error" id="cuipError">CUIP o PIN no autorizados. Verifica tus datos o contacta al equipo de acreditación.</p>
           </form>
 
           <p class="exam-status" id="examStatus" hidden>Verificando…</p>
@@ -215,6 +219,7 @@
 
     const cuipFormEl = document.getElementById("cuipForm");
     const cuipInputEl = document.getElementById("examCuip");
+    const pinInputEl = document.getElementById("examPin");
     const cuipErrorEl = document.getElementById("cuipError");
     const statusEl = document.getElementById("examStatus");
     const errorEl = document.getElementById("examError");
@@ -227,6 +232,7 @@
     const diplomaBtn = document.getElementById("diplomaBtn");
 
     let cuipActual = "";
+    let pinActual = "";
 
     function renderQuestions(preguntas) {
       if (!preguntas.length) {
@@ -265,7 +271,8 @@
       errorEl.classList.remove("is-visible");
 
       const cuip = cuipInputEl.value.trim();
-      if (!cuip) return;
+      const pin = pinInputEl.value.trim();
+      if (!cuip || !pin) return;
 
       const verifyBtn = cuipFormEl.querySelector("button[type='submit']");
       verifyBtn.disabled = true;
@@ -274,7 +281,9 @@
       statusEl.hidden = false;
 
       try {
-        const res = await fetch(`${APPS_SCRIPT_URL}?cuip=${encodeURIComponent(cuip)}`);
+        const res = await fetch(
+          `${APPS_SCRIPT_URL}?cuip=${encodeURIComponent(cuip)}&pin=${encodeURIComponent(pin)}`
+        );
         if (!res.ok) throw new Error("network");
         const data = await res.json();
 
@@ -286,6 +295,7 @@
         }
 
         cuipActual = cuip;
+        pinActual = pin;
         agentLabelEl.textContent = `Agente: ${data.nombre} ${data.apellidos}`;
         renderQuestions(data.preguntas || []);
         statusEl.hidden = true;
@@ -318,7 +328,7 @@
         const res = await fetch(APPS_SCRIPT_URL, {
           method: "POST",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({ cuip: cuipActual, respuestas }),
+          body: JSON.stringify({ cuip: cuipActual, pin: pinActual, respuestas }),
         });
         const data = await res.json();
         if (data.error) throw new Error(data.error);
