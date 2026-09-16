@@ -6,9 +6,11 @@
  *
  * El Sheet debe tener tres pestañas:
  *
- * "Agentes"    -> columnas: id | cuip | nombre | apellidos
- *                 (la llena manualmente el administrador; solo los CUIP
- *                 que aparezcan aquí pueden acceder al examen)
+ * "Agentes"    -> columnas: id | cuip | pin | nombre | apellidos
+ *                 (la llena manualmente el administrador; solo quien
+ *                 conozca el CUIP Y el PIN puede acceder al examen.
+ *                 El PIN es un código corto que el administrador entrega
+ *                 a cada agente por un canal privado, NO es público.)
  * "Preguntas"  -> columnas: id | pregunta | opcionA | opcionB | opcionC | opcionD | correcta
  * "Resultados" -> se llena sola; Apps Script agrega una fila por cada envío.
  */
@@ -17,19 +19,25 @@ const AGENTES_TAB = "Agentes";
 const PREGUNTAS_TAB = "Preguntas";
 const RESULTADOS_TAB = "Resultados";
 
-function buscarAgente(cuip) {
+function buscarAgente(cuip, pin) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const sheet = ss.getSheetByName(AGENTES_TAB);
   const data = sheet.getDataRange().getValues();
   const headers = data.shift();
   const cuipIdx = headers.indexOf("cuip");
+  const pinIdx = headers.indexOf("pin");
   const nombreIdx = headers.indexOf("nombre");
   const apellidosIdx = headers.indexOf("apellidos");
 
   const cuipBuscado = String(cuip || "").trim();
-  if (!cuipBuscado) return null;
+  const pinBuscado = String(pin || "").trim();
+  if (!cuipBuscado || !pinBuscado) return null;
 
-  const fila = data.find((row) => String(row[cuipIdx]).trim() === cuipBuscado);
+  const fila = data.find(
+    (row) =>
+      String(row[cuipIdx]).trim() === cuipBuscado &&
+      String(row[pinIdx]).trim() === pinBuscado
+  );
   if (!fila) return null;
 
   return { nombre: fila[nombreIdx], apellidos: fila[apellidosIdx] };
@@ -55,14 +63,15 @@ function obtenerPreguntas() {
 
 function doGet(e) {
   const cuip = e.parameter.cuip;
+  const pin = e.parameter.pin;
 
-  if (!cuip) {
+  if (!cuip || !pin) {
     return ContentService.createTextOutput(
-      JSON.stringify({ error: "Falta el parámetro cuip" })
+      JSON.stringify({ error: "Falta el parámetro cuip o pin" })
     ).setMimeType(ContentService.MimeType.JSON);
   }
 
-  const agente = buscarAgente(cuip);
+  const agente = buscarAgente(cuip, pin);
   if (!agente) {
     return ContentService.createTextOutput(
       JSON.stringify({ autorizado: false })
@@ -82,10 +91,10 @@ function doGet(e) {
 function doPost(e) {
   const body = JSON.parse(e.postData.contents);
 
-  const agente = buscarAgente(body.cuip);
+  const agente = buscarAgente(body.cuip, body.pin);
   if (!agente) {
     return ContentService.createTextOutput(
-      JSON.stringify({ error: "CUIP no autorizado" })
+      JSON.stringify({ error: "CUIP o PIN no autorizado" })
     ).setMimeType(ContentService.MimeType.JSON);
   }
 
