@@ -127,6 +127,56 @@
   }
 
   /* ---------------------------------------------------------------------
+     Cuenta regresiva — inicio de la primera auditoría CALEA
+     --------------------------------------------------------------------- */
+  const countdown = document.getElementById("auditCountdown");
+  if (countdown) {
+    const start = new Date(countdown.dataset.start).getTime();
+    const target = new Date(countdown.dataset.target).getTime();
+    const fill = document.getElementById("countdownFill");
+    const doneEl = countdown.querySelector(".countdown-done");
+    const nums = {};
+    countdown.querySelectorAll("[data-unit]").forEach((el) => (nums[el.dataset.unit] = el));
+
+    const pad = (n) => String(n).padStart(2, "0");
+
+    const setNum = (el, value) => {
+      if (el.textContent === value) return;
+      el.textContent = value;
+      if (reducedMotion) return;
+      el.classList.remove("is-tick");
+      void el.offsetWidth;
+      el.classList.add("is-tick");
+    };
+
+    let timer;
+    const tick = () => {
+      const now = Date.now();
+      const diff = Math.max(target - now, 0);
+      const totalSec = Math.floor(diff / 1000);
+
+      setNum(nums.days, pad(Math.floor(totalSec / 86400)));
+      setNum(nums.hours, pad(Math.floor((totalSec % 86400) / 3600)));
+      setNum(nums.minutes, pad(Math.floor((totalSec % 3600) / 60)));
+      setNum(nums.seconds, pad(totalSec % 60));
+
+      if (fill && target > start) {
+        const ratio = Math.min(Math.max((now - start) / (target - start), 0), 1);
+        fill.style.width = `${(ratio * 100).toFixed(2)}%`;
+      }
+
+      if (diff === 0) {
+        countdown.classList.add("is-done");
+        if (doneEl) doneEl.hidden = false;
+        clearInterval(timer);
+      }
+    };
+
+    tick();
+    timer = setInterval(tick, 1000);
+  }
+
+  /* ---------------------------------------------------------------------
      Organigrama — ramas expandibles con acordeón
      --------------------------------------------------------------------- */
   const orgChart = document.getElementById("orgChart");
