@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tu Voz Cuenta — Policía Municipal de Ensenada</title>
+  <meta name="description" content="Comparte lo que destacas de la Policía Municipal de Ensenada, reconoce a un elemento o envía tus sugerencias para que podamos servirte mejor." />
+  <meta name="theme-color" content="#0a1730" />
+  <link rel="canonical" href="https://ensenadapoliciaacreditada.github.io/calea/ciudadania.html" />
+
+  <link rel="icon" type="image/png" href="assets/logos/Logo-policia.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/header-hero.css" />
+  <link rel="stylesheet" href="css/sections.css" />
+  <link rel="stylesheet" href="css/footer.css" />
+
+  <style>
+    .exam-hero {
+      background: var(--gradient-navy);
+      color: var(--white);
+      padding: calc(var(--space-11) + var(--space-6)) 0 var(--space-8);
+    }
+    .exam-hero .eyebrow { color: var(--gold-400); }
+    .exam-hero .section-title { color: var(--white); }
+    .exam-hero p { color: var(--silver-300); max-width: 660px; }
+
+    .exam-card {
+      max-width: 760px;
+      margin: 0 auto;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: var(--space-7);
+    }
+
+    /* ---- Aviso de emergencias ---- */
+    .cz-emergency {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2) var(--space-4);
+      padding: var(--space-3) var(--space-4);
+      margin-bottom: var(--space-6);
+      border-radius: var(--radius-sm);
+      background: #fdeeee;
+      color: #7a1f27;
+      font-size: var(--fs-sm);
+      text-align: center;
+    }
+    .cz-emergency a { color: #7a1f27; font-weight: 700; white-space: nowrap; }
+
+    /* ---- Preguntas ---- */
+    .voz-question {
+      padding: var(--space-5);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: var(--offwhite);
+      margin-bottom: var(--space-4);
+    }
+    .voz-question-head {
+      display: flex;
+      gap: var(--space-3);
+      align-items: flex-start;
+      margin-bottom: var(--space-3);
+    }
+    .voz-question-icon {
+      flex-shrink: 0;
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--navy-900);
+      color: var(--gold-400);
+    }
+    .voz-question-icon svg { width: 20px; height: 20px; }
+    .voz-question-title {
+      font-family: var(--font-display);
+      font-size: var(--fs-base);
+      color: var(--ink-900);
+      line-height: var(--lh-snug);
+    }
+    .voz-question-hint { margin-top: var(--space-1); font-size: var(--fs-xs); color: var(--ink-500); }
+    .voz-question textarea {
+      width: 100%;
+      min-height: 8rem;
+      resize: vertical;
+      padding: 0.85em 1em;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      color: var(--ink-900);
+      font-family: var(--font-body);
+      font-size: var(--fs-sm);
+      line-height: var(--lh-normal);
+    }
+    .voz-question textarea:focus { outline: none; border-color: var(--gold-500); }
+    .voz-count { margin-top: var(--space-1); text-align: right; font-size: var(--fs-xs); color: var(--silver-500); }
+
+    /* ---- Reconocimiento (desplegable) ---- */
+    .cz-recognition { padding: 0; }
+    .cz-recognition summary {
+      list-style: none;
+      display: flex;
+      gap: var(--space-3);
+      align-items: center;
+      padding: var(--space-5);
+      cursor: pointer;
+    }
+    .cz-recognition summary::-webkit-details-marker { display: none; }
+    .cz-recognition summary .voz-question-title { flex: 1; }
+    .cz-recognition summary .cz-chevron { width: 20px; height: 20px; color: var(--ink-500); transition: transform var(--dur-fast) var(--ease-out); }
+    .cz-recognition[open] summary .cz-chevron { transform: rotate(180deg); }
+    .cz-recognition-body { padding: 0 var(--space-5) var(--space-5); }
+    .cz-optional { font-family: var(--font-body); font-size: var(--fs-xs); color: var(--ink-500); font-weight: 400; }
+
+    /* ---- Datos opcionales ---- */
+    .cz-data {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-3);
+      margin-top: var(--space-5);
+    }
+    .cz-data-title {
+      grid-column: 1 / -1;
+      font-family: var(--font-display);
+      font-size: var(--fs-sm);
+      letter-spacing: var(--ls-wide);
+      text-transform: uppercase;
+      color: var(--navy-800);
+    }
+    .exam-field label {
+      display: block;
+      font-size: var(--fs-xs);
+      letter-spacing: var(--ls-wide);
+      text-transform: uppercase;
+      color: var(--ink-500);
+      margin-bottom: var(--space-2);
+    }
+    .exam-field input {
+      width: 100%;
+      padding: 0.85em 1em;
+      background: var(--offwhite);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      color: var(--ink-900);
+      font-family: var(--font-body);
+      font-size: var(--fs-sm);
+    }
+    .exam-field input:focus { outline: none; border-color: var(--gold-500); }
+
+    .cz-trap { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+    .cz-privacy { margin: var(--space-5) 0; font-size: var(--fs-xs); color: var(--ink-500); line-height: var(--lh-normal); }
+
+    .voz-msg { text-align: center; font-size: var(--fs-sm); color: #a33; min-height: 1.2em; margin-top: var(--space-3); }
+
+    .cz-complaint {
+      margin-top: var(--space-5);
+      padding-top: var(--space-4);
+      border-top: 1px solid var(--line);
+      font-size: var(--fs-xs);
+      color: var(--ink-500);
+      text-align: center;
+    }
+    .cz-complaint a { color: var(--navy-700); font-weight: 600; }
+
+    /* ---- Gracias ---- */
+    .voz-thanks { text-align: center; padding: var(--space-6) 0 var(--space-4); }
+    .voz-thanks-icon {
+      display: grid;
+      place-items: center;
+      width: 72px;
+      height: 72px;
+      margin: 0 auto var(--space-5);
+      border-radius: 50%;
+      background: var(--gradient-gold);
+      color: var(--navy-950);
+      box-shadow: var(--shadow-gold);
+    }
+    .voz-thanks-icon svg { width: 34px; height: 34px; }
+    .voz-thanks h2 { font-size: var(--fs-xl); color: var(--navy-900); text-transform: uppercase; }
+    .voz-thanks p { color: var(--ink-500); max-width: 30rem; margin: var(--space-3) auto 0; }
+    .voz-thanks-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-3); margin-top: var(--space-6); }
+    .voz-thanks-actions .btn-ghost { color: var(--navy-900); border-color: var(--line); }
+
+    @media (max-width: 640px) {
+      .exam-card { padding: var(--space-5) var(--space-4); }
+      .voz-question { padding: var(--space-4); }
+      .cz-recognition { padding: 0; }
+      .cz-recognition summary { padding: var(--space-4); }
+      .cz-recognition-body { padding: 0 var(--space-4) var(--space-4); }
+      .cz-data { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Saltar al contenido</a>
+
+  <header class="site-header" id="siteHeader">
+    <div class="container">
+      <a class="brand" href="index.html">
+        <span class="header-calea-chip">
+          <img src="assets/logos/calea-logo.png" alt="CALEA — The Gold Standard in Public Safety" />
+        </span>
+        <img class="brand-badge" src="assets/logos/Logo-policia.png" alt="Escudo Policía Municipal de Ensenada" width="84" height="84" />
+        <span class="brand-text">
+          <strong>DSPM Ensenada</strong>
+          <span>Acreditación CALEA</span>
+        </span>
+      </a>
+      <a class="btn btn-ghost" href="index.html">Volver al inicio</a>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="exam-hero">
+      <div class="container">
+        <span class="eyebrow">Ciudadanía · Ensenada, B.C.</span>
+        <h1 class="section-title">Tu Voz Cuenta</h1>
+        <p>Gracias por ayudarnos a construir una mejor Policía Municipal. Cuéntanos qué destacas de nuestro servicio, reconoce a un elemento que haya hecho la diferencia o compártenos una sugerencia para servirte mejor. Cada comentario lo lee el equipo de la Dirección.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="exam-card">
+          <form id="czForm" novalidate>
+            <p class="cz-emergency">
+              <span>Este formulario no es para emergencias.</span>
+              <span>Emergencias: <a href="tel:911">911</a> · Denuncia anónima: <a href="tel:089">089</a></span>
+            </p>
+
+            <div class="voz-question">
+              <div class="voz-question-head">
+                <span class="voz-question-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1L12 2Z" /></svg></span>
+                <div>
+                  <label class="voz-question-title" for="czDestaca">¿Qué destacas o agradeces de la Policía Municipal de Ensenada?</label>
+                  <p class="voz-question-hint">Por ejemplo: la atención que recibiste, la presencia de patrullas en tu colonia, el trato amable de un elemento, la rapidez con que te apoyaron.</p>
+                </div>
+              </div>
+              <textarea id="czDestaca" maxlength="2000" placeholder="Escribe aquí…"></textarea>
+              <p class="voz-count" data-for="czDestaca">0 / 2000</p>
+            </div>
+
+            <div class="voz-question">
+              <div class="voz-question-head">
+                <span class="voz-question-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4" /><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1V17h6v-.2c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2Z" /></svg></span>
+                <div>
+                  <label class="voz-question-title" for="czSugerencia">¿Qué nos sugieres para servirte mejor?</label>
+                  <p class="voz-question-hint">Por ejemplo: más recorridos en cierto horario, programas de prevención en tu escuela o colonia, mejores formas de comunicarnos contigo.</p>
+                </div>
+              </div>
+              <textarea id="czSugerencia" maxlength="2000" placeholder="Escribe aquí…"></textarea>
+              <p class="voz-count" data-for="czSugerencia">0 / 2000</p>
+            </div>
+
+            <details class="voz-question cz-recognition">
+              <summary>
+                <span class="voz-question-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.4 8.7 8 11 4.6-2.3 8-6 8-11V5l-8-3Z" /><path d="m9 12 2 2 4-4" /></svg></span>
+                <span class="voz-question-title">¿Quieres reconocer a un elemento? <span class="cz-optional">(opcional)</span></span>
+                <svg class="cz-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+              </summary>
+              <div class="cz-recognition-body">
+                <p class="voz-question-hint" style="margin-bottom:var(--space-3);">Cuéntanos quién te ayudó (nombre o número de patrulla, si lo recuerdas), dónde y cuándo. Haremos llegar tu reconocimiento.</p>
+                <textarea id="czReconocimiento" maxlength="2000" placeholder="Escribe aquí…" aria-label="Reconocimiento a un elemento"></textarea>
+                <p class="voz-count" data-for="czReconocimiento">0 / 2000</p>
+              </div>
+            </details>
+
+            <div class="cz-data">
+              <p class="cz-data-title">Datos opcionales</p>
+              <div class="exam-field">
+                <label for="czZona">Colonia o zona</label>
+                <input id="czZona" type="text" maxlength="200" autocomplete="address-level3" />
+              </div>
+              <div class="exam-field">
+                <label for="czNombre">Tu nombre</label>
+                <input id="czNombre" type="text" maxlength="200" autocomplete="name" />
+              </div>
+              <div class="exam-field">
+                <label for="czContacto">Correo o teléfono</label>
+                <input id="czContacto" type="text" maxlength="200" autocomplete="email" />
+              </div>
+            </div>
+
+            <!-- Campo trampa para robots: invisible para las personas -->
+            <div class="cz-trap" aria-hidden="true">
+              <label for="czSitio">No llenar</label>
+              <input id="czSitio" type="text" tabindex="-1" autocomplete="off" />
+            </div>
+
+            <p class="cz-privacy">Puedes enviar tu comentario sin dejar tus datos. Si los compartes, la Dirección de Seguridad Pública Municipal de Ensenada los usará únicamente para dar seguimiento a tu comentario y no se publicarán.</p>
+
+            <button class="btn btn-primary" type="submit" style="width:100%; justify-content:center;">
+              Enviar mi comentario
+            </button>
+            <p class="voz-msg" id="czMsg" aria-live="polite"></p>
+
+            <p class="cz-complaint">¿Tu comentario es una queja sobre la actuación de un elemento? También puedes escribirla aquí, en la pregunta de sugerencias: cuéntanos qué pasó, dónde y cuándo, y deja un dato de contacto para darle seguimiento.</p>
+          </form>
+
+          <div class="voz-thanks" id="czThanks" hidden>
+            <div class="voz-thanks-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7" /></svg></div>
+            <h2>¡Gracias por tu comentario!</h2>
+            <p>Lo recibimos y lo leerá el equipo de la Dirección. Tu participación nos ayuda a servir mejor a Ensenada.</p>
+            <div class="voz-thanks-actions">
+              <button class="btn btn-primary" type="button" id="czOtro">Enviar otro comentario</button>
+              <a class="btn btn-ghost" href="index.html">Volver al inicio</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom" style="border-top:0; padding-top:0;">
+        <span>© <span id="year"></span> Dirección de Seguridad Pública Municipal de Ensenada. Todos los derechos reservados.</span>
+        <span>Sitio informativo del proceso de acreditación CALEA</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Misma Web App de Google Apps Script que usan examen.html, cursos.html e ideas.html
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxp5x-N9F9MiMHh-LxGhuUABppDAivDJY_wHwOJ2FH6iV16fBde93zRM9_y8Avq8grzWQ/exec";
+
+    const formEl = document.getElementById("czForm");
+    const msgEl = document.getElementById("czMsg");
+    const thanksEl = document.getElementById("czThanks");
+    const field = (id) => document.getElementById(id);
+
+    // Momento en que se abrió el formulario (los robots lo envían al instante).
+    let startedAt = Date.now();
+
+    document.querySelectorAll(".voz-count").forEach((counter) => {
+      const area = field(counter.dataset.for);
+      area.addEventListener("input", () => {
+        counter.textContent = `${area.value.length} / 2000`;
+      });
+    });
+
+    formEl.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      msgEl.textContent = "";
+
+      const payload = {
+        action: "enviarCiudadano",
+        destaca: field("czDestaca").value.trim(),
+        sugerencia: field("czSugerencia").value.trim(),
+        reconocimiento: field("czReconocimiento").value.trim(),
+        zona: field("czZona").value.trim(),
+        nombre: field("czNombre").value.trim(),
+        contacto: field("czContacto").value.trim(),
+        sitio: field("czSitio").value,
+        segundos: Math.round((Date.now() - startedAt) / 1000),
+      };
+
+      if (!payload.destaca && !payload.sugerencia && !payload.reconocimiento) {
+        msgEl.textContent = "Escribe al menos un comentario.";
+        return;
+      }
+
+      const btn = formEl.querySelector("button[type='submit']");
+      btn.disabled = true;
+      btn.textContent = "Enviando…";
+
+      try {
+        const res = await fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) throw new Error("network");
+        const data = await res.json();
+        if (!data.ok) {
+          // Un error de acceso (autorizado: false) no aplica a la ciudadanía: mensaje genérico.
+          msgEl.textContent =
+            data.error && data.autorizado === undefined ? data.error : "No se pudo enviar tu comentario. Intenta de nuevo.";
+          return;
+        }
+        formEl.hidden = true;
+        thanksEl.hidden = false;
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } catch (err) {
+        msgEl.textContent = "No se pudo enviar tu comentario. Intenta de nuevo.";
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Enviar mi comentario";
+      }
+    });
+
+    field("czOtro").addEventListener("click", () => {
+      formEl.reset();
+      document.querySelectorAll(".voz-count").forEach((c) => (c.textContent = "0 / 2000"));
+      startedAt = Date.now();
+      thanksEl.hidden = true;
+      formEl.hidden = false;
+    });
+
+    const yearEl = document.getElementById("year");
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

@@ -1099,6 +1099,11 @@
   color: var(--gold-400);
 }
 
+.voz-cta--ciudadania {
+  margin-top: 0;
+  margin-bottom: var(--space-8);
+}
+
 .qr-card {
   display: flex;
   flex-direction: column;

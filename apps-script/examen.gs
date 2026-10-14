@@ -27,6 +27,8 @@
  *                     Los anónimos no guardan CUIP ni nombre. El equipo puede
  *                     usar "estado" (Nueva / En análisis / Implementada) y
  *                     "notas_del_equipo" para darles seguimiento.
+ * "Ciudadanía"     -> comentarios de Tu Voz Cuenta (ciudadania.html), formulario
+ *                     público sin CUIP. Nombre y contacto son opcionales.
  *
  * Las constancias (PDF o foto) se guardan en la carpeta de Drive
  * CONSTANCIAS_FOLDER_NAME, en el Drive de la cuenta dueña del script.
@@ -57,6 +59,16 @@ const IDEAS_CORREO = "caleadspmensenada@gmail.com";
 const IDEAS_MAX_CARACTERES = 2000;
 const IDEAS_MAX_POR_PERIODO = 3; // envíos por CUIP cada 6 horas (límite de CacheService)
 const IDEAS_PERIODO_SEGUNDOS = 6 * 60 * 60;
+
+// "Tu Voz Cuenta": comentarios de la ciudadanía (formulario público, sin CUIP).
+const CIUDADANIA_TAB = "Ciudadanía";
+const CIUDADANIA_MAX_CARACTERES = 2000;
+const CIUDADANIA_MAX_CORTO = 200;
+const CIUDADANIA_MIN_SEGUNDOS = 4; // menos que esto llenando el formulario = robot
+// Límite global (no hay forma de identificar a cada visitante): protege la hoja
+// y la cuota diaria de correos que comparte con Voz DSPM.
+const CIUDADANIA_MAX_POR_10_MIN = 20;
+const CIUDADANIA_MAX_CORREOS_6H = 20;
 
 // Cursos obligatorios. "clave" es un fragmento del nombre del curso tal como
 // aparece en la página de verificación del emisor (sin acentos, en mayúsculas).
@@ -251,6 +263,10 @@ function doPost(e) {
 
   if (body.action === "enviarIdea") {
     return jsonOut(enviarIdea(body));
+  }
+
+  if (body.action === "enviarCiudadano") {
+    return jsonOut(enviarCiudadano(body));
   }
 
   if (body.action === "registrarCurso") {
@@ -714,6 +730,123 @@ function enviarIdea(body) {
   } catch (err) {
     // El mensaje ya quedó guardado en la hoja; el correo es solo un aviso.
     console.error("No se pudo enviar el aviso por correo: " + err);
+  }
+
+  return { ok: true };
+}
+
+/* ==========================================================================
+   Tu Voz Cuenta — comentarios de la ciudadanía (público, sin CUIP)
+   ========================================================================== */
+
+function hojaCiudadania() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName(CIUDADANIA_TAB);
+  if (!sheet) {
+    sheet = ss.insertSheet(CIUDADANIA_TAB);
+    const headers = [
+      "fecha",
+      "lo_que_destaca",
+      "sugerencia",
+      "reconocimiento_a_elemento",
+      "colonia_o_zona",
+      "nombre",
+      "contacto",
+      "estado",
+      "notas_del_equipo",
+    ];
+    sheet.appendRow(headers);
+    sheet.setFrozenRows(1);
+    sheet.getRange(1, 1, 1, headers.length).setFontWeight("bold");
+  }
+  return sheet;
+}
+
+// Incrementa un contador temporal; devuelve false si ya llegó al máximo.
+function dentroDeLimite(clave, maximo, segundos) {
+  const cache = CacheService.getScriptCache();
+  const lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    const n = Number(cache.get(clave) || 0);
+    if (n >= maximo) return false;
+    cache.put(clave, String(n + 1), segundos);
+    return true;
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function enviarCiudadano(body) {
+  // Robots: el campo trampa "sitio" es invisible para personas, y nadie llena
+  // el formulario en menos de unos segundos. Se responde "ok" para no darles pistas.
+  if (String(body.sitio || "").trim() !== "") return { ok: true };
+  if (Number(body.segundos || 0) < CIUDADANIA_MIN_SEGUNDOS) return { ok: true };
+
+  const limpiar = (t, max) => String(t || "").replace(/\r\n?/g, "\n").trim().slice(0, max + 1);
+  const destaca = limpiar(body.destaca, CIUDADANIA_MAX_CARACTERES);
+  const sugerencia = limpiar(body.sugerencia, CIUDADANIA_MAX_CARACTERES);
+  const reconocimiento = limpiar(body.reconocimiento, CIUDADANIA_MAX_CARACTERES);
+  const zona = limpiar(body.zona, CIUDADANIA_MAX_CORTO);
+  const nombre = limpiar(body.nombre, CIUDADANIA_MAX_CORTO);
+  const contacto = limpiar(body.contacto, CIUDADANIA_MAX_CORTO);
+
+  if (!destaca && !sugerencia && !reconocimiento) {
+    return { error: "Escribe al menos un comentario." };
+  }
+  if ([destaca, sugerencia, reconocimiento].some((t) => t.length > CIUDADANIA_MAX_CARACTERES)) {
+    return { error: `Cada respuesta puede tener como máximo ${CIUDADANIA_MAX_CARACTERES} caracteres.` };
+  }
+  if ([zona, nombre, contacto].some((t) => t.length > CIUDADANIA_MAX_CORTO)) {
+    return { error: "Alguno de los datos opcionales es demasiado largo." };
+  }
+
+  if (!dentroDeLimite("ciudadania_10min", CIUDADANIA_MAX_POR_10_MIN, 10 * 60)) {
+    return { error: "En este momento estamos recibiendo muchos comentarios. Intenta de nuevo en unos minutos." };
+  }
+
+  hojaCiudadania().appendRow([
+    new Date(),
+    comoTexto(destaca),
+    comoTexto(sugerencia),
+    comoTexto(reconocimiento),
+    comoTexto(zona),
+    comoTexto(nombre),
+    comoTexto(contacto),
+    "Nuevo",
+    "",
+  ]);
+
+  if (dentroDeLimite("ciudadania_correos_6h", CIUDADANIA_MAX_CORREOS_6H, 6 * 60 * 60)) {
+    const cuerpo = [
+      "Nuevo comentario ciudadano en Tu Voz Cuenta (sitio de acreditación CALEA)",
+      "",
+      "Lo que destaca o agradece:",
+      destaca || "(sin respuesta)",
+      "",
+      "Sugerencia para servir mejor:",
+      sugerencia || "(sin respuesta)",
+      "",
+      "Reconocimiento a un elemento:",
+      reconocimiento || "(sin respuesta)",
+      "",
+      "Colonia o zona: " + (zona || "(no indicó)"),
+      "Nombre: " + (nombre || "(anónimo)"),
+      "Contacto: " + (contacto || "(no dejó datos de contacto)"),
+      "",
+      "—",
+      `Registro completo en la pestaña "${CIUDADANIA_TAB}" del Sheet del examen.`,
+    ].join("\n");
+    try {
+      MailApp.sendEmail({
+        to: IDEAS_CORREO,
+        subject: "Tu Voz Cuenta — nuevo comentario ciudadano",
+        body: cuerpo,
+        name: "Tu Voz Cuenta",
+      });
+    } catch (err) {
+      console.error("No se pudo enviar el aviso por correo: " + err);
+    }
   }
 
   return { ok: true };
