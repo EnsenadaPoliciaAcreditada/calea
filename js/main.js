@@ -16,28 +16,31 @@
   /* ---------------------------------------------------------------------
      Menú móvil
      --------------------------------------------------------------------- */
+  // Solo la página principal tiene menú; las demás páginas solo usan el header.
   const navToggle = document.getElementById("navToggle");
   const mainNav = document.getElementById("mainNav");
 
-  const closeNav = () => {
-    mainNav.classList.remove("is-open");
-    navToggle.setAttribute("aria-expanded", "false");
-    document.body.style.overflow = "";
-  };
+  if (navToggle && mainNav) {
+    const closeNav = () => {
+      mainNav.classList.remove("is-open");
+      navToggle.setAttribute("aria-expanded", "false");
+      document.body.style.overflow = "";
+    };
 
-  navToggle.addEventListener("click", () => {
-    const isOpen = mainNav.classList.toggle("is-open");
-    navToggle.setAttribute("aria-expanded", String(isOpen));
-    document.body.style.overflow = isOpen ? "hidden" : "";
-  });
+    navToggle.addEventListener("click", () => {
+      const isOpen = mainNav.classList.toggle("is-open");
+      navToggle.setAttribute("aria-expanded", String(isOpen));
+      document.body.style.overflow = isOpen ? "hidden" : "";
+    });
 
-  mainNav.querySelectorAll("a").forEach((link) => {
-    link.addEventListener("click", closeNav);
-  });
+    mainNav.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", closeNav);
+    });
 
-  window.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeNav();
-  });
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeNav();
+    });
+  }
 
   /* ---------------------------------------------------------------------
      Resalte del enlace de navegación activo según la sección visible
