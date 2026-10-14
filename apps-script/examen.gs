@@ -124,7 +124,8 @@ function buscarAgente(cuip, pin) {
  * ese CUIP queda bloqueado BLOQUEO_SEGUNDOS (contados desde el último fallo).
  * Cada intento "reserva" su lugar en el contador antes de consultar la hoja,
  * así que lanzar muchas peticiones a la vez no permite saltarse el límite.
- * Devuelve { agente } si es válido, { bloqueado: true } si está bloqueado, o {}.
+ * Devuelve { agente } si es válido, { bloqueado: true } si está bloqueado, o
+ * { restantes } con los intentos que le quedan antes del bloqueo.
  */
 function autenticar(cuip, pin) {
   const cuipLimpio = String(cuip || "").trim();
@@ -133,12 +134,14 @@ function autenticar(cuip, pin) {
   const cache = CacheService.getScriptCache();
   const clave = "fallos_" + cuipLimpio;
 
+  let intento;
   const lock = LockService.getScriptLock();
   lock.waitLock(10000);
   try {
     const fallos = Number(cache.get(clave) || 0);
     if (fallos >= MAX_INTENTOS) return { bloqueado: true };
-    cache.put(clave, String(fallos + 1), BLOQUEO_SEGUNDOS);
+    intento = fallos + 1;
+    cache.put(clave, String(intento), BLOQUEO_SEGUNDOS);
   } finally {
     lock.releaseLock();
   }
@@ -148,13 +151,27 @@ function autenticar(cuip, pin) {
     cache.remove(clave);
     return { agente };
   }
-  return {};
+  return { restantes: MAX_INTENTOS - intento };
 }
 
 function errorDeAcceso(auth) {
-  return auth.bloqueado
-    ? { autorizado: false, bloqueado: true, error: MENSAJE_BLOQUEO }
-    : { autorizado: false, error: "CUIP o PIN no autorizado" };
+  if (auth.bloqueado) {
+    return { autorizado: false, bloqueado: true, error: MENSAJE_BLOQUEO };
+  }
+  if (auth.restantes === 0) {
+    return {
+      autorizado: false,
+      bloqueado: true,
+      intentosRestantes: 0,
+      error: "CUIP o PIN no autorizados. Ese era tu último intento: tu acceso quedó bloqueado 15 minutos.",
+    };
+  }
+  const resp = { autorizado: false, error: "CUIP o PIN no autorizado" };
+  if (auth.restantes !== undefined) {
+    resp.intentosRestantes = auth.restantes;
+    resp.error = `CUIP o PIN no autorizados. Te ${auth.restantes === 1 ? "queda 1 intento" : `quedan ${auth.restantes} intentos`} antes de que tu acceso se bloquee 15 minutos.`;
+  }
+  return resp;
 }
 
 function obtenerPreguntas() {

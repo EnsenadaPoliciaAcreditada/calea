@@ -500,8 +500,11 @@
         if (!data.autorizado) {
           statusEl.hidden = true;
           cuipFormEl.hidden = false;
-          cuipErrorEl.textContent = data.bloqueado ? data.error : CUIP_ERROR_MSG;
+          cuipErrorEl.textContent =
+            data.bloqueado || data.intentosRestantes !== undefined ? data.error : CUIP_ERROR_MSG;
           cuipErrorEl.classList.add("is-visible");
+          pinInputEl.value = "";
+          pinInputEl.focus();
           return;
         }
         if (!Array.isArray(data.cursos)) throw new Error("backend");
