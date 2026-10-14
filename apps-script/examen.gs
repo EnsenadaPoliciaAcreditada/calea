@@ -23,6 +23,10 @@
  *                     Rechazado) y escribir el motivo en "nota".
  * "Resumen cursos" -> se regenera sola: una fila por agente con el estado
  *                     de sus 3 cursos y si ya cumplió con todos.
+ * "Ideas"          -> reconocimientos e ideas de mejora de Voz DSPM (ideas.html).
+ *                     Los anónimos no guardan CUIP ni nombre. El equipo puede
+ *                     usar "estado" (Nueva / En análisis / Implementada) y
+ *                     "notas_del_equipo" para darles seguimiento.
  *
  * Las constancias (PDF o foto) se guardan en la carpeta de Drive
  * CONSTANCIAS_FOLDER_NAME, en el Drive de la cuenta dueña del script.
@@ -46,6 +50,13 @@ const MAX_ARCHIVO_BYTES = 5 * 1024 * 1024;
 const MAX_INTENTOS = 5;
 const BLOQUEO_SEGUNDOS = 15 * 60;
 const MENSAJE_BLOQUEO = "Demasiados intentos fallidos. Espera 15 minutos e intenta de nuevo.";
+
+// "Voz DSPM": reconocimientos e ideas de mejora del personal (uso interno).
+const IDEAS_TAB = "Ideas";
+const IDEAS_CORREO = "caleadspmensenada@gmail.com";
+const IDEAS_MAX_CARACTERES = 2000;
+const IDEAS_MAX_POR_PERIODO = 3; // envíos por CUIP cada 6 horas (límite de CacheService)
+const IDEAS_PERIODO_SEGUNDOS = 6 * 60 * 60;
 
 // Cursos obligatorios. "clave" es un fragmento del nombre del curso tal como
 // aparece en la página de verificación del emisor (sin acentos, en mayúsculas).
@@ -207,6 +218,10 @@ function responderAcceso(cuip, pin, action) {
     };
   }
 
+  if (action === "perfil") {
+    return { autorizado: true, nombre: agente.nombre, apellidos: agente.apellidos };
+  }
+
   return {
     autorizado: true,
     nombre: agente.nombre,
@@ -230,8 +245,12 @@ function doGet(e) {
 function doPost(e) {
   const body = JSON.parse(e.postData.contents);
 
-  if (body.action === "acceso" || body.action === "cursos") {
+  if (body.action === "acceso" || body.action === "cursos" || body.action === "perfil") {
     return jsonOut(responderAcceso(body.cuip, body.pin, body.action));
+  }
+
+  if (body.action === "enviarIdea") {
+    return jsonOut(enviarIdea(body));
   }
 
   if (body.action === "registrarCurso") {
@@ -343,6 +362,13 @@ function nombresCoinciden(nombreAgente, nombreConstancia) {
     .split(" ")
     .filter((p) => p.length > 1);
   return palabras.length > 0 && palabras.every((p) => enConstancia.has(p));
+}
+
+// Evita que un texto escrito por el usuario (o traído de otro sitio) se ejecute
+// como fórmula en la hoja, p. ej. "=IMPORTDATA(...)": se guarda como texto.
+function comoTexto(valor) {
+  const s = String(valor == null ? "" : valor);
+  return /^[=+\-@\t\r]/.test(s) ? "'" + s : s;
 }
 
 function decodificarHtml(texto) {
@@ -519,10 +545,10 @@ function registrarCurso(body) {
       curso.id,
       curso.nombre,
       folio,
-      v.nombre || "",
-      v.fecha || "",
+      comoTexto(v.nombre),
+      comoTexto(v.fecha),
       estado,
-      nota,
+      comoTexto(nota),
       archivoUrl,
       v.url,
     ];
@@ -592,6 +618,119 @@ function onEdit(e) {
   if (e && e.range && e.range.getSheet().getName() === CURSOS_TAB) {
     reconstruirResumen();
   }
+}
+
+/* ==========================================================================
+   Voz DSPM — reconocimientos e ideas de mejora (uso interno)
+   ========================================================================== */
+
+function hojaIdeas() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName(IDEAS_TAB);
+  if (!sheet) {
+    sheet = ss.insertSheet(IDEAS_TAB);
+    const headers = ["fecha", "tipo", "cuip", "nombre", "lo_que_valora", "idea_de_mejora", "estado", "notas_del_equipo"];
+    sheet.appendRow(headers);
+    sheet.setFrozenRows(1);
+    sheet.getRange(1, 1, 1, headers.length).setFontWeight("bold");
+  }
+  return sheet;
+}
+
+/**
+ * Recibe un reconocimiento y/o una idea de mejora. El CUIP + PIN solo sirve
+ * para confirmar que quien escribe es personal de la DSPM: si el agente marca
+ * "anónimo", su nombre y CUIP NO se guardan en la hoja ni se envían por correo.
+ * (El límite de envíos usa un contador temporal por CUIP que no guarda el
+ * contenido y desaparece solo a las 6 horas.)
+ */
+function enviarIdea(body) {
+  const auth = autenticar(body.cuip, body.pin);
+  if (!auth.agente) return errorDeAcceso(auth);
+  const agente = auth.agente;
+
+  const limpiar = (t) => String(t || "").replace(/\r\n?/g, "\n").trim();
+  const valora = limpiar(body.valora);
+  const mejora = limpiar(body.mejora);
+  const anonimo = body.anonimo === true;
+
+  if (!valora && !mejora) {
+    return { error: "Escribe al menos una de las dos respuestas." };
+  }
+  if (valora.length > IDEAS_MAX_CARACTERES || mejora.length > IDEAS_MAX_CARACTERES) {
+    return { error: `Cada respuesta puede tener como máximo ${IDEAS_MAX_CARACTERES} caracteres.` };
+  }
+
+  const cache = CacheService.getScriptCache();
+  const clave = "ideas_" + agente.cuip;
+  const lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    const enviados = Number(cache.get(clave) || 0);
+    if (enviados >= IDEAS_MAX_POR_PERIODO) {
+      return { error: "Ya enviaste varias ideas hoy, ¡gracias! Podrás enviar más en unas horas." };
+    }
+    cache.put(clave, String(enviados + 1), IDEAS_PERIODO_SEGUNDOS);
+  } finally {
+    lock.releaseLock();
+  }
+
+  const nombre = `${agente.nombre} ${agente.apellidos}`.trim();
+  const tipo = anonimo ? "Anónimo" : "Identificado";
+
+  hojaIdeas().appendRow([
+    new Date(),
+    tipo,
+    anonimo ? "" : agente.cuip,
+    anonimo ? "" : nombre,
+    comoTexto(valora),
+    comoTexto(mejora),
+    "Nueva",
+    "",
+  ]);
+
+  const cuerpo = [
+    "Nuevo mensaje en Voz DSPM (sitio de acreditación CALEA)",
+    "",
+    "Enviado por: " + (anonimo ? "Anónimo (personal verificado de la DSPM)" : `${nombre} — CUIP ${agente.cuip}`),
+    "",
+    "Lo que más valora de la Policía Municipal de Ensenada:",
+    valora || "(sin respuesta)",
+    "",
+    "Idea para mejorar:",
+    mejora || "(sin respuesta)",
+    "",
+    "—",
+    `Registro completo en la pestaña "${IDEAS_TAB}" del Sheet del examen.`,
+  ].join("\n");
+
+  try {
+    MailApp.sendEmail({
+      to: IDEAS_CORREO,
+      subject: `Voz DSPM — nuevo mensaje (${tipo.toLowerCase()})`,
+      body: cuerpo,
+      name: "Voz DSPM",
+    });
+  } catch (err) {
+    // El mensaje ya quedó guardado en la hoja; el correo es solo un aviso.
+    console.error("No se pudo enviar el aviso por correo: " + err);
+  }
+
+  return { ok: true };
+}
+
+/**
+ * Ejecútala una vez desde el editor para autorizar el permiso de enviar
+ * correos (necesario para Voz DSPM). Envía un correo de prueba a IDEAS_CORREO.
+ */
+function probarCorreo() {
+  MailApp.sendEmail({
+    to: IDEAS_CORREO,
+    subject: "Voz DSPM — correo de prueba",
+    body: "Si recibiste este correo, los avisos de Voz DSPM ya funcionan.",
+    name: "Voz DSPM",
+  });
+  Logger.log("Correo de prueba enviado a " + IDEAS_CORREO + ". Correos restantes hoy: " + MailApp.getRemainingDailyQuota());
 }
 
 /**

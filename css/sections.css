@@ -1090,6 +1090,15 @@
   height: 100%;
 }
 
+.voz-cta {
+  margin-top: var(--space-8);
+  margin-bottom: 0;
+}
+
+.voz-cta .eyebrow {
+  color: var(--gold-400);
+}
+
 .qr-card {
   display: flex;
   flex-direction: column;

@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Voz DSPM — Personal DSPM Ensenada</title>
+  <meta name="description" content="Espacio interno para que el personal de la Dirección de Seguridad Pública Municipal de Ensenada comparta lo que valora de la corporación y sus ideas de mejora." />
+  <meta name="theme-color" content="#0a1730" />
+  <meta name="robots" content="noindex" />
+
+  <link rel="icon" type="image/png" href="assets/logos/Logo-policia.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/header-hero.css" />
+  <link rel="stylesheet" href="css/sections.css" />
+  <link rel="stylesheet" href="css/footer.css" />
+
+  <style>
+    .exam-hero {
+      background: var(--gradient-navy);
+      color: var(--white);
+      padding: calc(var(--space-11) + var(--space-6)) 0 var(--space-8);
+    }
+    .exam-hero .eyebrow { color: var(--gold-400); }
+    .exam-hero .section-title { color: var(--white); }
+    .exam-hero p { color: var(--silver-300); max-width: 660px; }
+
+    .exam-card {
+      max-width: 760px;
+      margin: 0 auto;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: var(--space-7);
+    }
+
+    .exam-field { margin-bottom: var(--space-5); }
+    .exam-field label {
+      display: block;
+      font-size: var(--fs-xs);
+      letter-spacing: var(--ls-wide);
+      text-transform: uppercase;
+      color: var(--ink-500);
+      margin-bottom: var(--space-2);
+    }
+    .exam-field input,
+    .exam-field textarea {
+      width: 100%;
+      padding: 0.85em 1em;
+      background: var(--offwhite);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      color: var(--ink-900);
+      font-family: var(--font-body);
+      font-size: var(--fs-sm);
+    }
+    .exam-field input:focus,
+    .exam-field textarea:focus {
+      outline: none;
+      border-color: var(--gold-500);
+    }
+
+    .exam-status {
+      text-align: center;
+      color: var(--ink-500);
+      font-size: var(--fs-sm);
+      padding: var(--space-8) 0;
+    }
+
+    .exam-error {
+      text-align: center;
+      color: #a33;
+      font-size: var(--fs-sm);
+      padding: var(--space-4) 0;
+      display: none;
+    }
+    .exam-error.is-visible { display: block; }
+
+    .exam-agent {
+      text-align: center;
+      font-family: var(--font-display);
+      font-size: var(--fs-sm);
+      letter-spacing: var(--ls-wide);
+      text-transform: uppercase;
+      color: var(--navy-800);
+      background: var(--paper);
+      border-radius: var(--radius-sm);
+      padding: var(--space-3);
+      margin-bottom: var(--space-6);
+    }
+
+    /* ---- Preguntas ---- */
+    .voz-question {
+      padding: var(--space-5);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: var(--offwhite);
+      margin-bottom: var(--space-4);
+    }
+    .voz-question-head {
+      display: flex;
+      gap: var(--space-3);
+      align-items: flex-start;
+      margin-bottom: var(--space-3);
+    }
+    .voz-question-icon {
+      flex-shrink: 0;
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--navy-900);
+      color: var(--gold-400);
+    }
+    .voz-question-icon svg { width: 20px; height: 20px; }
+    .voz-question-title {
+      font-family: var(--font-display);
+      font-size: var(--fs-base);
+      color: var(--ink-900);
+      line-height: var(--lh-snug);
+    }
+    .voz-question-hint { margin-top: var(--space-1); font-size: var(--fs-xs); color: var(--ink-500); }
+    .voz-question textarea {
+      width: 100%;
+      min-height: 8.5rem;
+      resize: vertical;
+      padding: 0.85em 1em;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      color: var(--ink-900);
+      font-family: var(--font-body);
+      font-size: var(--fs-sm);
+      line-height: var(--lh-normal);
+    }
+    .voz-question textarea:focus { outline: none; border-color: var(--gold-500); }
+    .voz-count { margin-top: var(--space-1); text-align: right; font-size: var(--fs-xs); color: var(--silver-500); }
+
+    /* ---- Anonimato ---- */
+    .voz-anon {
+      display: flex;
+      gap: var(--space-3);
+      align-items: flex-start;
+      padding: var(--space-4) var(--space-5);
+      border-radius: var(--radius-md);
+      background: var(--paper);
+      margin: var(--space-5) 0;
+      cursor: pointer;
+    }
+    .voz-anon input { margin-top: 0.25em; width: 18px; height: 18px; accent-color: var(--gold-600); flex-shrink: 0; }
+    .voz-anon strong { display: block; color: var(--ink-900); font-size: var(--fs-sm); }
+    .voz-anon span { display: block; color: var(--ink-500); font-size: var(--fs-xs); margin-top: var(--space-1); line-height: var(--lh-normal); }
+
+    .voz-msg { text-align: center; font-size: var(--fs-sm); color: #a33; min-height: 1.2em; margin-top: var(--space-3); }
+
+    /* ---- Gracias ---- */
+    .voz-thanks { text-align: center; padding: var(--space-6) 0 var(--space-4); }
+    .voz-thanks-icon {
+      display: grid;
+      place-items: center;
+      width: 72px;
+      height: 72px;
+      margin: 0 auto var(--space-5);
+      border-radius: 50%;
+      background: var(--gradient-gold);
+      color: var(--navy-950);
+      box-shadow: var(--shadow-gold);
+    }
+    .voz-thanks-icon svg { width: 34px; height: 34px; }
+    .voz-thanks h2 { font-size: var(--fs-xl); color: var(--navy-900); text-transform: uppercase; }
+    .voz-thanks p { color: var(--ink-500); max-width: 30rem; margin: var(--space-3) auto 0; }
+    .voz-thanks-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-3); margin-top: var(--space-6); }
+    .voz-thanks-actions .btn-ghost { color: var(--navy-900); border-color: var(--line); }
+
+    @media (max-width: 640px) {
+      .exam-card { padding: var(--space-5) var(--space-4); }
+      .voz-question { padding: var(--space-4); }
+      .voz-anon { padding: var(--space-4); }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Saltar al contenido</a>
+
+  <header class="site-header" id="siteHeader">
+    <div class="container">
+      <a class="brand" href="index.html">
+        <span class="header-calea-chip">
+          <img src="assets/logos/calea-logo.png" alt="CALEA — The Gold Standard in Public Safety" />
+        </span>
+        <img class="brand-badge" src="assets/logos/Logo-policia.png" alt="Escudo Policía Municipal de Ensenada" width="84" height="84" />
+        <span class="brand-text">
+          <strong>DSPM Ensenada</strong>
+          <span>Acreditación CALEA</span>
+        </span>
+      </a>
+      <a class="btn btn-ghost" href="index.html">Volver al inicio</a>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="exam-hero">
+      <div class="container">
+        <span class="eyebrow">Personal DSPM · Uso interno</span>
+        <h1 class="section-title">Voz DSPM</h1>
+        <p>Tu experiencia construye a la Policía Municipal de Ensenada. Cuéntanos qué te enorgullece de la corporación y qué idea tienes para hacerla mejor. Cada mensaje lo leen el equipo de acreditación y la Dirección, y puedes enviarlo de forma anónima.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="exam-card">
+          <form id="cuipForm">
+            <div class="exam-field">
+              <label for="examCuip">CUIP</label>
+              <input id="examCuip" name="cuip" type="text" autocomplete="off" required />
+            </div>
+            <div class="exam-field">
+              <label for="examPin">PIN personal</label>
+              <input id="examPin" name="pin" type="password" inputmode="numeric" autocomplete="off" required />
+            </div>
+            <button class="btn btn-primary" type="submit" style="width:100%; justify-content:center;">
+              Verificar acceso
+            </button>
+            <p class="exam-error" id="cuipError">CUIP o PIN no autorizados. Verifica tus datos o contacta al equipo de acreditación.</p>
+          </form>
+
+          <p class="exam-status" id="examStatus" hidden>Verificando…</p>
+          <p class="exam-error" id="examError">No se pudo conectar. Verifica tu conexión e intenta de nuevo más tarde.</p>
+
+          <form id="vozForm" hidden>
+            <p class="exam-agent" id="vozAgent"></p>
+
+            <div class="voz-question">
+              <div class="voz-question-head">
+                <span class="voz-question-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.4 8.7 8 11 4.6-2.3 8-6 8-11V5l-8-3Z" /><path d="m9 12 2 2 4-4" /></svg></span>
+                <div>
+                  <label class="voz-question-title" for="vozValora">¿Qué es lo que más te enorgullece de la Policía Municipal de Ensenada?</label>
+                  <p class="voz-question-hint">Por ejemplo: el compañerismo en tu turno, una acción de un compañero que te inspiró, el trato a la ciudadanía, algo que la corporación hace bien.</p>
+                </div>
+              </div>
+              <textarea id="vozValora" name="valora" maxlength="2000" placeholder="Escribe aquí…"></textarea>
+              <p class="voz-count" data-for="vozValora">0 / 2000</p>
+            </div>
+
+            <div class="voz-question">
+              <div class="voz-question-head">
+                <span class="voz-question-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4" /><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1V17h6v-.2c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2Z" /></svg></span>
+                <div>
+                  <label class="voz-question-title" for="vozMejora">Si pudieras mejorar una cosa, ¿cuál sería y cómo lo harías?</label>
+                  <p class="voz-question-hint">Por ejemplo: una capacitación que te gustaría recibir, un procedimiento que se podría simplificar, equipo o instalaciones, la comunicación entre áreas.</p>
+                </div>
+              </div>
+              <textarea id="vozMejora" name="mejora" maxlength="2000" placeholder="Escribe aquí…"></textarea>
+              <p class="voz-count" data-for="vozMejora">0 / 2000</p>
+            </div>
+
+            <label class="voz-anon">
+              <input type="checkbox" id="vozAnonimo" />
+              <div>
+                <strong>Enviar como anónimo</strong>
+                <span>Tu CUIP solo se usa para confirmar que eres personal de la DSPM. Si marcas esta opción, tu nombre y tu CUIP no se guardan ni se envían junto con tu mensaje.</span>
+              </div>
+            </label>
+
+            <button class="btn btn-primary" type="submit" style="width:100%; justify-content:center;">
+              Enviar mi mensaje
+            </button>
+            <p class="voz-msg" id="vozMsg" aria-live="polite"></p>
+          </form>
+
+          <div class="voz-thanks" id="vozThanks" hidden>
+            <div class="voz-thanks-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7" /></svg></div>
+            <h2>¡Gracias por tu aporte!</h2>
+            <p id="vozThanksMsg">Tu mensaje llegó al equipo de acreditación. Las ideas del personal ayudan a construir una mejor Policía Municipal de Ensenada.</p>
+            <div class="voz-thanks-actions">
+              <button class="btn btn-primary" type="button" id="vozOtra">Enviar otro mensaje</button>
+              <a class="btn btn-ghost" href="index.html">Volver al inicio</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom" style="border-top:0; padding-top:0;">
+        <span>© <span id="year"></span> Dirección de Seguridad Pública Municipal de Ensenada. Todos los derechos reservados.</span>
+        <span>Sitio informativo del proceso de acreditación CALEA</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Misma Web App de Google Apps Script que usan examen.html y cursos.html
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxp5x-N9F9MiMHh-LxGhuUABppDAivDJY_wHwOJ2FH6iV16fBde93zRM9_y8Avq8grzWQ/exec";
+
+    const cuipFormEl = document.getElementById("cuipForm");
+    const cuipInputEl = document.getElementById("examCuip");
+    const pinInputEl = document.getElementById("examPin");
+    const cuipErrorEl = document.getElementById("cuipError");
+    const statusEl = document.getElementById("examStatus");
+    const errorEl = document.getElementById("examError");
+    const vozFormEl = document.getElementById("vozForm");
+    const agentEl = document.getElementById("vozAgent");
+    const valoraEl = document.getElementById("vozValora");
+    const mejoraEl = document.getElementById("vozMejora");
+    const anonimoEl = document.getElementById("vozAnonimo");
+    const msgEl = document.getElementById("vozMsg");
+    const thanksEl = document.getElementById("vozThanks");
+    const thanksMsgEl = document.getElementById("vozThanksMsg");
+
+    const CUIP_ERROR_MSG = cuipErrorEl.textContent;
+
+    let cuipActual = "";
+    let pinActual = "";
+    let nombreActual = "";
+
+    const post = async (payload) => {
+      const res = await fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error("network");
+      return res.json();
+    };
+
+    const updateAgentLabel = () => {
+      agentEl.textContent = anonimoEl.checked ? "Enviarás como: Anónimo" : `Enviarás como: ${nombreActual}`;
+    };
+    anonimoEl.addEventListener("change", updateAgentLabel);
+
+    document.querySelectorAll(".voz-count").forEach((counter) => {
+      const area = document.getElementById(counter.dataset.for);
+      area.addEventListener("input", () => {
+        counter.textContent = `${area.value.length} / 2000`;
+      });
+    });
+
+    cuipFormEl.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      cuipErrorEl.classList.remove("is-visible");
+      errorEl.classList.remove("is-visible");
+
+      const cuip = cuipInputEl.value.trim();
+      const pin = pinInputEl.value.trim();
+      if (!cuip || !pin) return;
+
+      cuipFormEl.hidden = true;
+      statusEl.hidden = false;
+
+      try {
+        const data = await post({ action: "perfil", cuip, pin });
+
+        if (!data.autorizado) {
+          statusEl.hidden = true;
+          cuipFormEl.hidden = false;
+          cuipErrorEl.textContent =
+            data.bloqueado || data.intentosRestantes !== undefined ? data.error : CUIP_ERROR_MSG;
+          cuipErrorEl.classList.add("is-visible");
+          pinInputEl.value = "";
+          pinInputEl.focus();
+          return;
+        }
+
+        cuipActual = cuip;
+        pinActual = pin;
+        nombreActual = `${data.nombre} ${data.apellidos}`.trim();
+        updateAgentLabel();
+        statusEl.hidden = true;
+        vozFormEl.hidden = false;
+        valoraEl.focus();
+      } catch (err) {
+        statusEl.hidden = true;
+        cuipFormEl.hidden = false;
+        errorEl.classList.add("is-visible");
+      }
+    });
+
+    vozFormEl.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const valora = valoraEl.value.trim();
+      const mejora = mejoraEl.value.trim();
+      msgEl.textContent = "";
+
+      if (!valora && !mejora) {
+        msgEl.textContent = "Escribe al menos una de las dos respuestas.";
+        return;
+      }
+
+      const btn = vozFormEl.querySelector("button[type='submit']");
+      btn.disabled = true;
+      btn.textContent = "Enviando…";
+
+      try {
+        const data = await post({
+          action: "enviarIdea",
+          cuip: cuipActual,
+          pin: pinActual,
+          valora,
+          mejora,
+          anonimo: anonimoEl.checked,
+        });
+        if (data.error) {
+          msgEl.textContent = data.error;
+          return;
+        }
+        thanksMsgEl.textContent = anonimoEl.checked
+          ? "Tu mensaje anónimo llegó al equipo de acreditación. Las ideas del personal ayudan a construir una mejor Policía Municipal de Ensenada."
+          : `Gracias, ${nombreActual}. Tu mensaje llegó al equipo de acreditación. Las ideas del personal ayudan a construir una mejor Policía Municipal de Ensenada.`;
+        vozFormEl.hidden = true;
+        thanksEl.hidden = false;
+      } catch (err) {
+        msgEl.textContent = "No se pudo enviar tu mensaje. Intenta de nuevo.";
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Enviar mi mensaje";
+      }
+    });
+
+    document.getElementById("vozOtra").addEventListener("click", () => {
+      vozFormEl.reset();
+      document.querySelectorAll(".voz-count").forEach((c) => (c.textContent = "0 / 2000"));
+      updateAgentLabel();
+      thanksEl.hidden = true;
+      vozFormEl.hidden = false;
+      valoraEl.focus();
+    });
+
+    const yearEl = document.getElementById("year");
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
