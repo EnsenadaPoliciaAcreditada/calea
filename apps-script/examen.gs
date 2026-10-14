@@ -42,6 +42,11 @@ const ESTADO_SIN_REGISTRO = "Sin registrar";
 
 const MAX_ARCHIVO_BYTES = 5 * 1024 * 1024;
 
+// Límite de intentos de acceso fallidos por CUIP.
+const MAX_INTENTOS = 5;
+const BLOQUEO_SEGUNDOS = 15 * 60;
+const MENSAJE_BLOQUEO = "Demasiados intentos fallidos. Espera 15 minutos e intenta de nuevo.";
+
 // Cursos obligatorios. "clave" es un fragmento del nombre del curso tal como
 // aparece en la página de verificación del emisor (sin acentos, en mayúsculas).
 const CURSOS = [
@@ -114,6 +119,44 @@ function buscarAgente(cuip, pin) {
   return { cuip: cuipBuscado, nombre: fila[nombreIdx], apellidos: fila[apellidosIdx] };
 }
 
+/**
+ * Verifica CUIP + PIN con límite de intentos: tras MAX_INTENTOS fallidos,
+ * ese CUIP queda bloqueado BLOQUEO_SEGUNDOS (contados desde el último fallo).
+ * Cada intento "reserva" su lugar en el contador antes de consultar la hoja,
+ * así que lanzar muchas peticiones a la vez no permite saltarse el límite.
+ * Devuelve { agente } si es válido, { bloqueado: true } si está bloqueado, o {}.
+ */
+function autenticar(cuip, pin) {
+  const cuipLimpio = String(cuip || "").trim();
+  if (!cuipLimpio || !String(pin || "").trim()) return {};
+
+  const cache = CacheService.getScriptCache();
+  const clave = "fallos_" + cuipLimpio;
+
+  const lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    const fallos = Number(cache.get(clave) || 0);
+    if (fallos >= MAX_INTENTOS) return { bloqueado: true };
+    cache.put(clave, String(fallos + 1), BLOQUEO_SEGUNDOS);
+  } finally {
+    lock.releaseLock();
+  }
+
+  const agente = buscarAgente(cuipLimpio, pin);
+  if (agente) {
+    cache.remove(clave);
+    return { agente };
+  }
+  return {};
+}
+
+function errorDeAcceso(auth) {
+  return auth.bloqueado
+    ? { autorizado: false, bloqueado: true, error: MENSAJE_BLOQUEO }
+    : { autorizado: false, error: "CUIP o PIN no autorizado" };
+}
+
 function obtenerPreguntas() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const sheet = ss.getSheetByName(PREGUNTAS_TAB);
@@ -132,6 +175,31 @@ function obtenerPreguntas() {
     });
 }
 
+// Acceso inicial: devuelve las preguntas del examen o el estado de los cursos.
+function responderAcceso(cuip, pin, action) {
+  const auth = autenticar(cuip, pin);
+  if (!auth.agente) return errorDeAcceso(auth);
+  const agente = auth.agente;
+
+  if (action === "cursos") {
+    return {
+      autorizado: true,
+      nombre: agente.nombre,
+      apellidos: agente.apellidos,
+      cursos: estadoCursosDeAgente(agente.cuip),
+    };
+  }
+
+  return {
+    autorizado: true,
+    nombre: agente.nombre,
+    apellidos: agente.apellidos,
+    preguntas: obtenerPreguntas(),
+  };
+}
+
+// Compatibilidad con versiones anteriores de las páginas, que mandaban el PIN
+// en la URL. Las páginas actuales usan POST (action "acceso" / "cursos").
 function doGet(e) {
   const cuip = e.parameter.cuip;
   const pin = e.parameter.pin;
@@ -139,40 +207,26 @@ function doGet(e) {
   if (!cuip || !pin) {
     return jsonOut({ error: "Falta el parámetro cuip o pin" });
   }
-
-  const agente = buscarAgente(cuip, pin);
-  if (!agente) {
-    return jsonOut({ autorizado: false });
-  }
-
-  if (e.parameter.action === "cursos") {
-    return jsonOut({
-      autorizado: true,
-      nombre: agente.nombre,
-      apellidos: agente.apellidos,
-      cursos: estadoCursosDeAgente(agente.cuip),
-    });
-  }
-
-  return jsonOut({
-    autorizado: true,
-    nombre: agente.nombre,
-    apellidos: agente.apellidos,
-    preguntas: obtenerPreguntas(),
-  });
+  return jsonOut(responderAcceso(cuip, pin, e.parameter.action));
 }
 
 function doPost(e) {
   const body = JSON.parse(e.postData.contents);
 
+  if (body.action === "acceso" || body.action === "cursos") {
+    return jsonOut(responderAcceso(body.cuip, body.pin, body.action));
+  }
+
   if (body.action === "registrarCurso") {
     return jsonOut(registrarCurso(body));
   }
 
-  const agente = buscarAgente(body.cuip, body.pin);
-  if (!agente) {
-    return jsonOut({ error: "CUIP o PIN no autorizado" });
+  // Envío de respuestas del examen
+  const auth = autenticar(body.cuip, body.pin);
+  if (!auth.agente) {
+    return jsonOut(errorDeAcceso(auth));
   }
+  const agente = auth.agente;
 
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const preguntasSheet = ss.getSheetByName(PREGUNTAS_TAB);
@@ -358,9 +412,22 @@ function guardarArchivo(archivo, agente, curso, folio) {
   return carpetaConstancias().createFile(blob).getUrl();
 }
 
+// Manda a la papelera de Drive la constancia que se está reemplazando
+// (sigue recuperable desde la papelera durante 30 días).
+function enviarAPapelera(urlArchivo) {
+  const m = String(urlArchivo || "").match(/\/d\/([-\w]+)/);
+  if (!m) return;
+  try {
+    DriveApp.getFileById(m[1]).setTrashed(true);
+  } catch (err) {
+    console.error("No se pudo mandar a la papelera la constancia anterior: " + err);
+  }
+}
+
 function registrarCurso(body) {
-  const agente = buscarAgente(body.cuip, body.pin);
-  if (!agente) return { error: "CUIP o PIN no autorizado" };
+  const auth = autenticar(body.cuip, body.pin);
+  if (!auth.agente) return errorDeAcceso(auth);
+  const agente = auth.agente;
 
   const curso = CURSOS.find((c) => c.id === body.curso);
   if (!curso) return { error: "Curso no reconocido" };
@@ -445,6 +512,7 @@ function registrarCurso(body) {
 
     const sheet = hojaCursos();
     if (previo) {
+      enviarAPapelera(previo.archivo);
       sheet.getRange(previo._fila, 1, 1, fila.length).setValues([fila]);
     } else {
       sheet.appendRow(fila);

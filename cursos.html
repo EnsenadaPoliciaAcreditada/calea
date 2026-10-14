@@ -291,6 +291,8 @@
     const fillEl = document.getElementById("coursesFill");
     const labelEl = document.getElementById("coursesLabel");
 
+    const CUIP_ERROR_MSG = cuipErrorEl.textContent;
+
     let cuipActual = "";
     let pinActual = "";
 
@@ -487,15 +489,18 @@
       statusEl.hidden = false;
 
       try {
-        const res = await fetch(
-          `${APPS_SCRIPT_URL}?action=cursos&cuip=${encodeURIComponent(cuip)}&pin=${encodeURIComponent(pin)}`
-        );
+        const res = await fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ action: "cursos", cuip, pin }),
+        });
         if (!res.ok) throw new Error("network");
         const data = await res.json();
 
         if (!data.autorizado) {
           statusEl.hidden = true;
           cuipFormEl.hidden = false;
+          cuipErrorEl.textContent = data.bloqueado ? data.error : CUIP_ERROR_MSG;
           cuipErrorEl.classList.add("is-visible");
           return;
         }
