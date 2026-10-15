@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Curso Obligatorio — Personal DSPM Ensenada</title>
+  <meta name="description" content="Curso obligatorio en línea para el personal de la Dirección de Seguridad Pública Municipal de Ensenada: Yo sé de género 1-2-3 de ONU Mujeres." />
+  <meta name="theme-color" content="#0a1730" />
+  <meta name="robots" content="noindex" />
+
+  <link rel="icon" type="image/png" href="assets/logos/Logo-policia.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/header-hero.css" />
+  <link rel="stylesheet" href="css/sections.css" />
+  <link rel="stylesheet" href="css/footer.css" />
+
+  <style>
+    .exam-hero {
+      background: var(--gradient-navy);
+      color: var(--white);
+      padding: calc(var(--space-11) + var(--space-6)) 0 var(--space-8);
+    }
+    .exam-hero .eyebrow { color: var(--gold-400); }
+    .exam-hero .section-title { color: var(--white); }
+    .exam-hero p { color: var(--silver-300); max-width: 660px; }
+
+    .exam-card {
+      max-width: 760px;
+      margin: 0 auto;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: var(--space-7);
+    }
+
+    .exam-field { margin-bottom: var(--space-5); }
+    .exam-field label {
+      display: block;
+      font-size: var(--fs-xs);
+      letter-spacing: var(--ls-wide);
+      text-transform: uppercase;
+      color: var(--ink-500);
+      margin-bottom: var(--space-2);
+    }
+    .exam-field input {
+      width: 100%;
+      padding: 0.85em 1em;
+      background: var(--offwhite);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      color: var(--ink-900);
+      font-family: var(--font-body);
+      font-size: var(--fs-sm);
+    }
+    .exam-field input:focus { outline: none; border-color: var(--gold-500); }
+
+    .exam-status { text-align: center; color: var(--ink-500); font-size: var(--fs-sm); padding: var(--space-8) 0; }
+
+    .exam-error { text-align: center; color: #a33; font-size: var(--fs-sm); padding: var(--space-4) 0; display: none; }
+    .exam-error.is-visible { display: block; }
+
+    .exam-agent {
+      text-align: center;
+      font-family: var(--font-display);
+      font-size: var(--fs-sm);
+      letter-spacing: var(--ls-wide);
+      text-transform: uppercase;
+      color: var(--navy-800);
+      background: var(--paper);
+      border-radius: var(--radius-sm);
+      padding: var(--space-3);
+      margin-bottom: var(--space-6);
+    }
+
+    /* ---- Tarjeta del curso ---- */
+    .oc-course {
+      position: relative;
+      padding: var(--space-6);
+      border-radius: var(--radius-md);
+      background: var(--gradient-navy);
+      color: var(--white);
+      overflow: hidden;
+      isolation: isolate;
+    }
+    .oc-course::after {
+      content: "";
+      position: absolute;
+      inset: -40% -30% auto auto;
+      width: 70%;
+      height: 120%;
+      background: radial-gradient(50% 50% at 50% 50%, rgba(217, 188, 111, 0.16) 0%, transparent 70%);
+      z-index: -1;
+    }
+    .oc-course-top { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-4); }
+    .oc-required {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-family: var(--font-display);
+      font-size: var(--fs-xs);
+      letter-spacing: var(--ls-wider);
+      text-transform: uppercase;
+      color: var(--gold-300);
+    }
+    .oc-required::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--gold-400); box-shadow: 0 0 0 4px rgba(217, 188, 111, 0.2); }
+    .oc-course h2 {
+      margin-top: var(--space-3);
+      font-size: var(--fs-lg);
+      text-transform: uppercase;
+      color: var(--white);
+    }
+    .oc-course-sub { margin-top: var(--space-2); color: var(--silver-300); font-size: var(--fs-sm); line-height: var(--lh-normal); }
+    .oc-facts { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-5); }
+    .oc-fact {
+      font-size: var(--fs-xs);
+      letter-spacing: var(--ls-wide);
+      text-transform: uppercase;
+      padding: 0.4em 0.9em;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--line-light);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--silver-300);
+    }
+    .oc-course .btn { margin-top: var(--space-6); }
+    .oc-course .btn svg { width: 1em; height: 1em; }
+
+    .course-pill {
+      flex-shrink: 0;
+      font-size: var(--fs-xs);
+      font-weight: 600;
+      letter-spacing: var(--ls-wide);
+      text-transform: uppercase;
+      padding: 0.35em 0.9em;
+      border-radius: var(--radius-pill);
+      background: rgba(255, 255, 255, 0.12);
+      color: var(--silver-300);
+    }
+    .course-pill--validado { background: #d9f2df; color: #1f6b3a; }
+    .course-pill--pendiente { background: #fff2cc; color: #8a6100; }
+    .course-pill--rechazado { background: #f8d7da; color: #8a1f2b; }
+
+    .oc-done {
+      display: flex;
+      gap: var(--space-3);
+      align-items: flex-start;
+      margin-top: var(--space-5);
+      padding: var(--space-4) var(--space-5);
+      border-radius: var(--radius-md);
+      background: #f3faf5;
+      border: 1px solid rgba(46, 140, 80, 0.35);
+      color: #1f6b3a;
+      font-size: var(--fs-sm);
+    }
+    .oc-done[hidden], .oc-register[hidden] { display: none; }
+    .oc-done svg { flex-shrink: 0; width: 22px; height: 22px; margin-top: 1px; }
+
+    /* ---- Pasos ---- */
+    .oc-steps-title {
+      margin-top: var(--space-7);
+      font-family: var(--font-display);
+      font-size: var(--fs-base);
+      letter-spacing: var(--ls-wide);
+      text-transform: uppercase;
+      color: var(--navy-900);
+    }
+    .oc-steps { list-style: none; margin: var(--space-4) 0 0; padding: 0; display: grid; gap: var(--space-3); }
+    .oc-step {
+      display: flex;
+      gap: var(--space-4);
+      align-items: flex-start;
+      padding: var(--space-4) var(--space-5);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: var(--offwhite);
+    }
+    .oc-step-num {
+      flex-shrink: 0;
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--gradient-gold);
+      color: var(--navy-950);
+      font-family: var(--font-display);
+      font-weight: 600;
+    }
+    .oc-step strong { display: block; color: var(--ink-900); font-size: var(--fs-sm); }
+    .oc-step p { margin-top: var(--space-1); color: var(--ink-500); font-size: var(--fs-sm); line-height: var(--lh-normal); }
+
+    .oc-register { margin-top: var(--space-6); text-align: center; }
+    .oc-register p { color: var(--ink-500); font-size: var(--fs-sm); margin-bottom: var(--space-3); }
+
+    @media (max-width: 640px) {
+      .exam-card { padding: var(--space-5) var(--space-4); }
+      .oc-course { padding: var(--space-5); }
+      .oc-course-top { flex-direction: column; gap: var(--space-2); }
+      .oc-course .btn { width: 100%; justify-content: center; }
+      .oc-step { padding: var(--space-4); gap: var(--space-3); }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Saltar al contenido</a>
+
+  <header class="site-header" id="siteHeader">
+    <div class="container">
+      <a class="brand" href="index.html">
+        <span class="header-calea-chip">
+          <img src="assets/logos/calea-logo.png" alt="CALEA — The Gold Standard in Public Safety" />
+        </span>
+        <img class="brand-badge" src="assets/logos/Logo-policia.png" alt="Escudo Policía Municipal de Ensenada" width="84" height="84" />
+        <span class="brand-text">
+          <strong>DSPM Ensenada</strong>
+          <span>Acreditación CALEA</span>
+        </span>
+      </a>
+      <a class="btn btn-ghost" href="index.html">Volver al inicio</a>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="exam-hero">
+      <div class="container">
+        <span class="eyebrow">Personal DSPM · Uso interno</span>
+        <h1 class="section-title">Curso Obligatorio</h1>
+        <p>Todo el personal de la Dirección de Seguridad Pública Municipal debe completar este curso en línea de ONU Mujeres. Ingresa con tu CUIP y PIN para ver las instrucciones y el estado de tu constancia.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="exam-card">
+          <form id="cuipForm">
+            <div class="exam-field">
+              <label for="examCuip">CUIP</label>
+              <input id="examCuip" name="cuip" type="text" autocomplete="off" required />
+            </div>
+            <div class="exam-field">
+              <label for="examPin">PIN personal</label>
+              <input id="examPin" name="pin" type="password" inputmode="numeric" autocomplete="off" required />
+            </div>
+            <button class="btn btn-primary" type="submit" style="width:100%; justify-content:center;">
+              Verificar acceso
+            </button>
+            <p class="exam-error" id="cuipError">CUIP o PIN no autorizados. Verifica tus datos o contacta al equipo de acreditación.</p>
+          </form>
+
+          <p class="exam-status" id="examStatus" hidden>Verificando…</p>
+          <p class="exam-error" id="examError">No se pudo conectar. Verifica tu conexión e intenta de nuevo más tarde.</p>
+
+          <div id="ocPanel" hidden>
+            <p class="exam-agent" id="ocAgent"></p>
+
+            <article class="oc-course">
+              <div class="oc-course-top">
+                <span class="oc-required">Curso obligatorio</span>
+                <span class="course-pill" id="ocPill">Sin registrar</span>
+              </div>
+              <h2>Yo sé de género 1-2-3</h2>
+              <p class="oc-course-sub">Conceptos básicos de género; Marco internacional para la igualdad de género; y Promoción de la igualdad de género en el sistema de la ONU.</p>
+              <div class="oc-facts">
+                <span class="oc-fact">ONU Mujeres</span>
+                <span class="oc-fact">En línea · a tu ritmo</span>
+                <span class="oc-fact">Gratuito</span>
+                <span class="oc-fact">Español</span>
+                <span class="oc-fact">Módulos 1, 2 y 3</span>
+              </div>
+              <a class="btn btn-primary" id="ocGo" href="https://trainingcentre.unwomen.org/local/unwcoursecatalogue/coursedetails.php?id=126" target="_blank" rel="noopener">
+                Ir al curso
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8" /></svg>
+              </a>
+            </article>
+
+            <div class="oc-done" id="ocDone" hidden>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" /><path d="m8 12 3 3 5-6" /></svg>
+              <span>¡Listo! Tu constancia de este curso ya está <strong>validada</strong>. No necesitas hacer nada más.</span>
+            </div>
+
+            <h3 class="oc-steps-title">Cómo completarlo</h3>
+            <ol class="oc-steps">
+              <li class="oc-step">
+                <span class="oc-step-num">1</span>
+                <div>
+                  <strong>Crea tu cuenta en el Centro de Capacitación de ONU Mujeres</strong>
+                  <p>Abre el curso con el botón <em>Ir al curso</em>. Si es tu primera vez, da clic en <em>Register</em> (Registrarse) y crea tu cuenta con tu correo. Escribe tu nombre completo tal como está registrado en la DSPM: así aparecerá en tu certificado.</p>
+                </div>
+              </li>
+              <li class="oc-step">
+                <span class="oc-step-num">2</span>
+                <div>
+                  <strong>Inscríbete en el curso</strong>
+                  <p>Ya con tu sesión iniciada, regresa a la página del curso y da clic en <em>Enrol now</em> (Inscribirme). La inscripción es gratuita.</p>
+                </div>
+              </li>
+              <li class="oc-step">
+                <span class="oc-step-num">3</span>
+                <div>
+                  <strong>Completa los módulos 1, 2 y 3</strong>
+                  <p>Puedes avanzar a tu ritmo y retomar donde te quedaste. Al terminar los tres módulos se habilita tu certificado.</p>
+                </div>
+              </li>
+              <li class="oc-step">
+                <span class="oc-step-num">4</span>
+                <div>
+                  <strong>Descarga tu certificado y regístralo</strong>
+                  <p>Descarga el certificado en PDF (incluye un código QR) y súbelo en la sección <em>Cursos de Género</em>. Se verifica automáticamente con ONU Mujeres.</p>
+                </div>
+              </li>
+            </ol>
+
+            <div class="oc-register" id="ocRegister">
+              <p>¿Ya terminaste el curso?</p>
+              <a class="btn btn-primary" href="cursos.html">Registrar mi constancia</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom" style="border-top:0; padding-top:0;">
+        <span>© <span id="year"></span> Dirección de Seguridad Pública Municipal de Ensenada. Todos los derechos reservados.</span>
+        <span>Sitio informativo del proceso de acreditación CALEA</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script>
+    // Misma Web App de Google Apps Script que usan examen.html y cursos.html
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxp5x-N9F9MiMHh-LxGhuUABppDAivDJY_wHwOJ2FH6iV16fBde93zRM9_y8Avq8grzWQ/exec";
+
+    // Id del curso en el registro de Cursos de Género (apps-script/examen.gs → CURSOS)
+    const CURSO_ID = "yo-se-de-genero";
+
+    const cuipFormEl = document.getElementById("cuipForm");
+    const cuipInputEl = document.getElementById("examCuip");
+    const pinInputEl = document.getElementById("examPin");
+    const cuipErrorEl = document.getElementById("cuipError");
+    const statusEl = document.getElementById("examStatus");
+    const errorEl = document.getElementById("examError");
+    const panelEl = document.getElementById("ocPanel");
+    const agentEl = document.getElementById("ocAgent");
+    const pillEl = document.getElementById("ocPill");
+    const doneEl = document.getElementById("ocDone");
+    const registerEl = document.getElementById("ocRegister");
+
+    const CUIP_ERROR_MSG = cuipErrorEl.textContent;
+
+    const pillClass = {
+      "Validado": "course-pill--validado",
+      "Pendiente de revisión": "course-pill--pendiente",
+      "Rechazado": "course-pill--rechazado",
+    };
+
+    cuipFormEl.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      cuipErrorEl.classList.remove("is-visible");
+      errorEl.classList.remove("is-visible");
+
+      const cuip = cuipInputEl.value.trim();
+      const pin = pinInputEl.value.trim();
+      if (!cuip || !pin) return;
+
+      cuipFormEl.hidden = true;
+      statusEl.hidden = false;
+
+      try {
+        const res = await fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ action: "cursos", cuip, pin }),
+        });
+        if (!res.ok) throw new Error("network");
+        const data = await res.json();
+
+        if (!data.autorizado) {
+          statusEl.hidden = true;
+          cuipFormEl.hidden = false;
+          cuipErrorEl.textContent =
+            data.bloqueado || data.intentosRestantes !== undefined ? data.error : CUIP_ERROR_MSG;
+          cuipErrorEl.classList.add("is-visible");
+          pinInputEl.value = "";
+          pinInputEl.focus();
+          return;
+        }
+
+        const curso = (data.cursos || []).find((c) => c.id === CURSO_ID);
+        const estado = curso ? curso.estado : "Sin registrar";
+        pillEl.textContent = estado;
+        pillEl.className = `course-pill ${pillClass[estado] || ""}`;
+        doneEl.hidden = estado !== "Validado";
+        registerEl.hidden = estado === "Validado";
+
+        agentEl.textContent = `Agente: ${data.nombre} ${data.apellidos}`;
+        statusEl.hidden = true;
+        panelEl.hidden = false;
+      } catch (err) {
+        statusEl.hidden = true;
+        cuipFormEl.hidden = false;
+        errorEl.classList.add("is-visible");
+      }
+    });
+
+    const yearEl = document.getElementById("year");
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

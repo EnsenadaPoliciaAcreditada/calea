@@ -154,6 +154,7 @@
       margin-top: var(--space-1);
     }
     .course-issuer { font-size: var(--fs-xs); color: var(--ink-500); margin-top: var(--space-1); }
+    .course-link { display: inline-block; margin-top: var(--space-2); font-size: var(--fs-xs); font-weight: 600; letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--gold-600); }
 
     .course-pill {
       flex-shrink: 0;
@@ -300,6 +301,11 @@
     const escapeHtml = (s) =>
       String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 
+    // Enlace para tomar cada curso (se muestra en su tarjeta). Agrega aquí los que falten.
+    const CURSO_LINKS = {
+      "yo-se-de-genero": "https://trainingcentre.unwomen.org/local/unwcoursecatalogue/coursedetails.php?id=126",
+    };
+
     const pillClass = (estado) =>
       ({
         "Validado": "course-pill--validado",
@@ -337,6 +343,7 @@
                   <div class="course-num">Curso ${i + 1}</div>
                   <div class="course-title">${escapeHtml(c.nombre)}</div>
                   <div class="course-issuer">${escapeHtml(c.emisor)}</div>
+                  ${CURSO_LINKS[c.id] ? `<a class="course-link" href="${CURSO_LINKS[c.id]}" target="_blank" rel="noopener">Ir al curso ↗</a>` : ""}
                 </div>
                 <span class="course-pill ${pillClass(c.estado)}">${escapeHtml(c.estado)}</span>
               </div>
