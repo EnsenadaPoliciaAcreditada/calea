@@ -1,6 +1,6 @@
 /**
  * Backend de la Autoevaluación CALEA (examen.html) y del registro de
- * cursos de género obligatorios (cursos.html).
+ * cursos de género (cursos.html).
  *
  * Este script vive DENTRO de un Google Sheet (Extensiones > Apps Script),
  * no se despliega desde GitHub. Se guarda aquí solo como referencia.
@@ -22,7 +22,7 @@
  *                     columna "estado" (Validado / Pendiente de revisión /
  *                     Rechazado) y escribir el motivo en "nota".
  * "Resumen cursos" -> se regenera sola: una fila por agente con el estado
- *                     de sus 3 cursos y si ya cumplió con todos.
+ *                     de cada curso y si ya cumplió con los obligatorios.
  * "Ideas"          -> reconocimientos e ideas de mejora de Voz DSPM (ideas.html).
  *                     Los anónimos no guardan CUIP ni nombre. El equipo puede
  *                     usar "estado" (Nueva / En análisis / Implementada) y
@@ -70,8 +70,10 @@ const CIUDADANIA_MIN_SEGUNDOS = 4; // menos que esto llenando el formulario = ro
 const CIUDADANIA_MAX_POR_10_MIN = 20;
 const CIUDADANIA_MAX_CORREOS_6H = 20;
 
-// Cursos obligatorios. "clave" es un fragmento del nombre del curso tal como
+// Cursos de género. "clave" es un fragmento del nombre del curso tal como
 // aparece en la página de verificación del emisor (sin acentos, en mayúsculas).
+// "obligatorio": solo estos cuentan para la columna "cumple" del resumen; los
+// opcionales se registran y verifican igual.
 const CURSOS = [
   {
     id: "yo-se-de-genero",
@@ -79,6 +81,7 @@ const CURSOS = [
     emisor: "ONU Mujeres",
     clave: "YO SE DE GENERO",
     plataforma: "onu",
+    obligatorio: true,
   },
   {
     id: "igualdad-sustantiva",
@@ -86,6 +89,7 @@ const CURSOS = [
     emisor: "Secretaría de las Mujeres",
     clave: "IGUALDAD SUSTANTIVA",
     plataforma: "campus",
+    obligatorio: false,
   },
   {
     id: "hostigamiento-acoso",
@@ -93,6 +97,7 @@ const CURSOS = [
     emisor: "Secretaría de las Mujeres",
     clave: "HOSTIGAMIENTO SEXUAL",
     plataforma: "campus",
+    obligatorio: false,
   },
 ];
 
@@ -320,7 +325,7 @@ function doPost(e) {
 }
 
 /* ==========================================================================
-   Cursos de género obligatorios
+   Cursos de género (obligatorios y opcionales)
    ========================================================================== */
 
 function hojaCursos() {
@@ -355,6 +360,7 @@ function estadoCursosDeAgente(cuip) {
       id: curso.id,
       nombre: curso.nombre,
       emisor: curso.emisor,
+      obligatorio: curso.obligatorio,
       estado: r ? r.estado : ESTADO_SIN_REGISTRO,
       folio: r ? r.folio : "",
       nota: r ? r.nota : "",
@@ -584,7 +590,7 @@ function registrarCurso(body) {
   }
 }
 
-// Una fila por agente con el estado de cada curso y si ya cumplió con los 3.
+// Una fila por agente con el estado de cada curso y si ya cumplió con los obligatorios.
 function reconstruirResumen() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   let sheet = ss.getSheetByName(RESUMEN_TAB);
@@ -596,10 +602,11 @@ function reconstruirResumen() {
   const nombreIdx = h.indexOf("nombre");
   const apellidosIdx = h.indexOf("apellidos");
   const registros = leerCursos();
+  const totalObligatorios = CURSOS.filter((c) => c.obligatorio).length;
 
   const headers = ["cuip", "nombre", "apellidos"]
-    .concat(CURSOS.map((c) => c.nombre))
-    .concat(["cursos validados", "cumple"]);
+    .concat(CURSOS.map((c) => (c.obligatorio ? c.nombre + " (obligatorio)" : c.nombre + " (opcional)")))
+    .concat(["obligatorios validados", "cumple"]);
 
   const filas = agentesData
     .filter((row) => String(row[cuipIdx]).trim() !== "")
@@ -609,10 +616,10 @@ function reconstruirResumen() {
         const r = registros.find((x) => String(x.cuip).trim() === cuip && x.curso_id === c.id);
         return r ? r.estado : ESTADO_SIN_REGISTRO;
       });
-      const validados = estados.filter((e) => e === ESTADO_VALIDADO).length;
+      const validados = CURSOS.filter((c, i) => c.obligatorio && estados[i] === ESTADO_VALIDADO).length;
       return [cuip, row[nombreIdx], row[apellidosIdx]]
         .concat(estados)
-        .concat([`${validados} de ${CURSOS.length}`, validados === CURSOS.length ? "Sí" : "No"]);
+        .concat([`${validados} de ${totalObligatorios}`, validados === totalObligatorios ? "Sí" : "No"]);
     });
 
   sheet.clear();

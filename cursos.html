@@ -140,6 +140,7 @@
       justify-content: space-between;
       gap: var(--space-4);
     }
+    .course.is-opcional .course-num { color: var(--ink-500); }
     .course-num {
       font-family: var(--font-display);
       font-size: var(--fs-xs);
@@ -220,7 +221,7 @@
       <div class="container">
         <span class="eyebrow">Personal DSPM · Uso interno</span>
         <h1 class="section-title">Cursos de Género</h1>
-        <p>Registra aquí las constancias de los 3 cursos obligatorios en materia de género. Sube el PDF de tu constancia: el folio se lee del código QR y se verifica con la institución que la emitió. Puedes tomar los cursos desde la <a href="https://xn--estrategiagnero-lnb.com/inicio/niveles-formativos" target="_blank" rel="noopener">Estrategia de Género de Baja California</a>.</p>
+        <p>Registra aquí la constancia del curso obligatorio en materia de género y, si tomaste alguno de los cursos opcionales, también la suya. Sube el PDF de tu constancia: el folio se lee del código QR y se verifica con la institución que la emitió. Puedes tomar los cursos desde la <a href="https://xn--estrategiagnero-lnb.com/inicio/niveles-formativos" target="_blank" rel="noopener">Estrategia de Género de Baja California</a>.</p>
       </div>
     </section>
 
@@ -313,10 +314,20 @@
         "Rechazado": "course-pill--rechazado",
       })[estado] || "";
 
+    // El backend indica cuáles son obligatorios; si es una versión anterior sin
+    // ese dato, el único obligatorio es "Yo sé de género 1-2-3".
+    const esObligatorio = (c) => (typeof c.obligatorio === "boolean" ? c.obligatorio : c.id === "yo-se-de-genero");
+
     function renderCourses(cursos) {
-      const validados = cursos.filter((c) => c.estado === "Validado").length;
-      fillEl.style.width = `${(validados / cursos.length) * 100}%`;
-      labelEl.textContent = `${validados} de ${cursos.length} validados`;
+      // Obligatorios primero; el avance cuenta solo los obligatorios.
+      cursos = [...cursos].sort((a, b) => esObligatorio(b) - esObligatorio(a));
+      const obligatorios = cursos.filter(esObligatorio);
+      const validados = obligatorios.filter((c) => c.estado === "Validado").length;
+      fillEl.style.width = `${obligatorios.length ? (validados / obligatorios.length) * 100 : 0}%`;
+      labelEl.textContent =
+        obligatorios.length === 1
+          ? `Obligatorio: ${validados ? "validado" : "pendiente"}`
+          : `${validados} de ${obligatorios.length} obligatorios validados`;
 
       listEl.innerHTML = cursos
         .map((c, i) => {
@@ -337,10 +348,10 @@
                 <button class="btn btn-primary" type="submit">${c.estado === "Sin registrar" ? "Registrar constancia" : "Volver a enviar"}</button>
               </form>`;
           return `
-            <article class="course ${validado ? "is-validado" : ""}">
+            <article class="course ${validado ? "is-validado" : ""} ${esObligatorio(c) ? "" : "is-opcional"}">
               <div class="course-head">
                 <div>
-                  <div class="course-num">Curso ${i + 1}</div>
+                  <div class="course-num">${esObligatorio(c) ? "Obligatorio" : "Opcional"}</div>
                   <div class="course-title">${escapeHtml(c.nombre)}</div>
                   <div class="course-issuer">${escapeHtml(c.emisor)}</div>
                   ${CURSO_LINKS[c.id] ? `<a class="course-link" href="${CURSO_LINKS[c.id]}" target="_blank" rel="noopener">Ir al curso ↗</a>` : ""}
