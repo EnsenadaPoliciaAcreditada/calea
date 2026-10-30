@@ -510,6 +510,64 @@
   color: var(--gold-300);
 }
 
+.countdown-comment {
+  margin-top: var(--space-5);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--line-light);
+}
+
+.countdown-comment-kicker {
+  font-family: var(--font-display);
+  font-size: var(--fs-xs);
+  letter-spacing: var(--ls-widest);
+  text-transform: uppercase;
+  color: var(--gold-300);
+}
+
+.countdown-comment-title {
+  margin-top: var(--space-2);
+  font-size: var(--fs-md);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-wide);
+  color: var(--white);
+}
+
+.countdown-comment p {
+  max-width: 36rem;
+  margin: var(--space-3) auto 0;
+  font-size: var(--fs-sm);
+  line-height: var(--lh-relaxed);
+  color: var(--silver-300);
+}
+
+.countdown-comment .btn {
+  margin-top: var(--space-5);
+}
+
+.countdown-comment .btn svg {
+  width: 1em;
+  height: 1em;
+}
+
+.countdown-comment .countdown-comment-note {
+  margin-top: var(--space-4);
+  font-size: var(--fs-xs);
+  line-height: var(--lh-normal);
+  color: var(--silver-400);
+}
+
+.countdown-comment .countdown-comment-date {
+  margin-top: var(--space-2);
+  letter-spacing: var(--ls-wide);
+  color: var(--silver-500);
+}
+
+.countdown-comment-note a {
+  color: var(--gold-300);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .countdown.is-done .countdown-units,
 .countdown.is-done .countdown-progress,
 .countdown.is-done .countdown-kicker {
@@ -533,6 +591,11 @@
   .countdown-label {
     font-size: 0.62rem;
     letter-spacing: var(--ls-wide);
+  }
+
+  .countdown-comment .btn {
+    width: 100%;
+    justify-content: center;
   }
 }
 
