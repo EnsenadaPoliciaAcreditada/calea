@@ -522,8 +522,31 @@
   color: var(--gold-300);
 }
 
+.calea-card-heading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  margin-top: var(--space-3);
+}
+
+.calea-card-logo {
+  display: flex;
+  align-items: center;
+  flex: none;
+  background: var(--white);
+  border-radius: var(--radius-sm);
+  padding: 0.35em 0.6em;
+  box-shadow: var(--shadow-sm);
+}
+
+.calea-card-logo img {
+  display: block;
+  width: auto;
+  height: 38px;
+}
+
 .calea-card-title {
-  margin-top: var(--space-2);
   font-size: var(--fs-md);
   text-transform: uppercase;
   letter-spacing: var(--ls-wide);
@@ -595,6 +618,18 @@
   .calea-card .btn {
     width: 100%;
     justify-content: center;
+  }
+
+  .calea-card-heading {
+    gap: var(--space-3);
+  }
+
+  .calea-card-logo img {
+    height: 30px;
+  }
+
+  .calea-card-title {
+    text-align: left;
   }
 }
 
