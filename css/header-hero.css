@@ -302,7 +302,8 @@
 }
 
 /* ---- Cuenta regresiva: primera auditoría CALEA ---- */
-.countdown {
+.countdown,
+.calea-card {
   position: relative;
   width: 100%;
   max-width: 44rem;
@@ -317,7 +318,8 @@
   isolation: isolate;
 }
 
-.countdown::before {
+.countdown::before,
+.calea-card::before {
   content: "";
   position: absolute;
   top: 0;
@@ -328,7 +330,8 @@
   border-radius: 0 0 2px 2px;
 }
 
-.countdown::after {
+.countdown::after,
+.calea-card::after {
   content: "";
   position: absolute;
   inset: -40% -20% auto;
@@ -510,13 +513,8 @@
   color: var(--gold-300);
 }
 
-.countdown-comment {
-  margin-top: var(--space-5);
-  padding-top: var(--space-5);
-  border-top: 1px solid var(--line-light);
-}
-
-.countdown-comment-kicker {
+/* ---- Aviso del portal de comentario público de CALEA (tarjeta bajo el reloj) ---- */
+.calea-card-kicker {
   font-family: var(--font-display);
   font-size: var(--fs-xs);
   letter-spacing: var(--ls-widest);
@@ -524,7 +522,7 @@
   color: var(--gold-300);
 }
 
-.countdown-comment-title {
+.calea-card-title {
   margin-top: var(--space-2);
   font-size: var(--fs-md);
   text-transform: uppercase;
@@ -532,7 +530,7 @@
   color: var(--white);
 }
 
-.countdown-comment p {
+.calea-card p {
   max-width: 36rem;
   margin: var(--space-3) auto 0;
   font-size: var(--fs-sm);
@@ -540,29 +538,29 @@
   color: var(--silver-300);
 }
 
-.countdown-comment .btn {
+.calea-card .btn {
   margin-top: var(--space-5);
 }
 
-.countdown-comment .btn svg {
+.calea-card .btn svg {
   width: 1em;
   height: 1em;
 }
 
-.countdown-comment .countdown-comment-note {
+.calea-card .calea-card-note {
   margin-top: var(--space-4);
   font-size: var(--fs-xs);
   line-height: var(--lh-normal);
   color: var(--silver-400);
 }
 
-.countdown-comment .countdown-comment-date {
+.calea-card .calea-card-date {
   margin-top: var(--space-2);
   letter-spacing: var(--ls-wide);
   color: var(--silver-500);
 }
 
-.countdown-comment-note a {
+.calea-card-note a {
   color: var(--gold-300);
   text-decoration: underline;
   text-underline-offset: 2px;
@@ -575,7 +573,8 @@
 }
 
 @media (max-width: 640px) {
-  .countdown {
+  .countdown,
+  .calea-card {
     padding: var(--space-5) var(--space-4) var(--space-4);
   }
 
@@ -593,7 +592,7 @@
     letter-spacing: var(--ls-wide);
   }
 
-  .countdown-comment .btn {
+  .calea-card .btn {
     width: 100%;
     justify-content: center;
   }
